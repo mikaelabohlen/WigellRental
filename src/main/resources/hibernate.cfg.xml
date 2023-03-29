@@ -16,5 +16,7 @@
         <property name="format_sql">false</property>
         <property name="hbm2ddl.auto">update</property>
 
+        <mapping class = "org.example.entities.Actor"/>
+
     </session-factory>
 </hibernate-configuration>
