@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 public class Actor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "actor_id")
     private int id;
     @Column(name = "first_name", length = 45, nullable = false)
     private String firtsName;

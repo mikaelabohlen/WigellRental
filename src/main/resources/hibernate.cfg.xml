@@ -17,6 +17,7 @@
         <property name="hbm2ddl.auto">update</property>
 
         <mapping class = "org.example.entities.Actor"/>
+        <mapping class="org.example.entities.Address"/>
 
     </session-factory>
 </hibernate-configuration>
