@@ -10,7 +10,7 @@ public class Actor {
     @Column(name = "actor_id")
     private int id;
     @Column(name = "first_name", length = 45, nullable = false)
-    private String firtsName;
+    private String firstName;
     @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
     @Column(name = "last_update", nullable = false)
@@ -27,12 +27,12 @@ public class Actor {
         return id;
     }
 
-    public String getFirtsName() {
-        return firtsName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirtsName(String firtsName) {
-        this.firtsName = firtsName;
+    public void setFirstName(String firtsName) {
+        this.firstName = firtsName;
     }
 
     public String getLastName() {
