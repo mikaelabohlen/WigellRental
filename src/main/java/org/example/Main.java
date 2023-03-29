@@ -1,7 +1,22 @@
 package org.example;
 
-public class Main {
+import javafx.application.Application;
+import javafx.stage.Stage;
+import org.example.gui.Gui;
+
+public class Main extends Application {
+    private Gui gui;
+    private Controller controller;
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        controller = new Controller();
+
+        gui = new Gui(primaryStage, controller);
+
+        gui.launch();
     }
 }
