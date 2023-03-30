@@ -13,20 +13,20 @@ public class Address {
     private int id;
     @Column(length = 50, nullable = false)
     private String address;
-    @Column(length = 50)
+    @Column(length = 50, columnDefinition = "default NULL")
     private String address2;
     @Column(length = 20, nullable = false)
     private String district;
     @OneToOne
     @JoinColumn(name = "city_id", nullable = false) // men om fk är nullable överflödig?
     private City city;
-    @Column(name = "postal_code", length = 10)
+    @Column(name = "postal_code", length = 10, columnDefinition = "default NULL")
     private String postalCode;
     @Column(length = 20)
     private String phone;
     @Column(nullable = false)
     private Geometry location; // blir detta rätt? Dependency tillagt i pom-filen
-    @Column(name = "last_update", nullable = false)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public Address() {

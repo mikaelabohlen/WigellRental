@@ -11,7 +11,7 @@ public class Country {
     private int id;
     @Column(name = "country", length = 50, nullable = false)
     private String country;
-    @Column(name = "last_update")
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public Country () {

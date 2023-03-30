@@ -14,16 +14,6 @@ public class Main extends Application {
     private Gui gui;
     private Controller controller;
     public static void main(String[] args) {
-        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-        Session session = sessionFactory.openSession();
-        Film film = session.get(Film.class, 1);
-
-        Iterator<String> itr = film.getSpecialFeatures().iterator();
-
-        while(itr.hasNext()) {
-            System.out.println(itr.next());
-        }
-
         launch(args);
     }
 

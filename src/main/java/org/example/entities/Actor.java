@@ -13,7 +13,7 @@ public class Actor {
     private String firstName;
     @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
-    @Column(name = "last_update", nullable = false)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public Actor(){

@@ -14,7 +14,7 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
-    @Column(name = "last_update", nullable = false)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public City() {

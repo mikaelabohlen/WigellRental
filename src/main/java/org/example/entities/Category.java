@@ -11,10 +11,10 @@ public class Category {
     @Column(name = "category_id")
     private int categoryId;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 25, nullable = false)
     private String name;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getCategoryId() {
