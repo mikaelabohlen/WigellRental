@@ -6,7 +6,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost/sakila</property>
+        <property name="connection.url">jdbc:mysql://localhost/sakila_feature1</property>
         <property name="connection.username">root</property>
         <property name="connection.password">root</property>
         <property name="connection.pool_size">3</property>
@@ -18,6 +18,7 @@
 
         <mapping class = "org.example.entities.Actor"/>
         <mapping class="org.example.entities.Address"/>
+        <mapping class="org.example.entities.FEATURE1"/>
 
     </session-factory>
 </hibernate-configuration>
