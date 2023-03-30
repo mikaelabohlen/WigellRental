@@ -2,7 +2,6 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 @Entity
 
@@ -11,9 +10,9 @@ public class Customer {
     @Id
     @Column(name = "customer_id")
     private int customerId;
-
-    @Column(name = "store_id", nullable = false)
-    private int storeId;
+    @OneToOne
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @Column(length = 50, nullable = false)
     private String firstName;
@@ -24,11 +23,12 @@ public class Customer {
     @Column(length = 50, nullable = false)
     private String email;
 
-    @Column(name = "address_id", nullable = false)
-    private int addressId;
+    @OneToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
 
     @Column(name = "active")
-    private byte active;
+    private boolean active;
 
     @Column(name = "create_date")
     private Timestamp createDate;
@@ -44,12 +44,12 @@ public class Customer {
         this.customerId = customerId;
     }
 
-    public int getStoreId() {
-        return storeId;
+    public Store getStore() {
+        return store;
     }
 
-    public void setStoreId(int storeId) {
-        this.storeId = storeId;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public String getFirstName() {
@@ -76,19 +76,19 @@ public class Customer {
         this.email = email;
     }
 
-    public int getAddressId() {
-        return addressId;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
-    public byte getActive() {
+    public boolean getActive() {
         return active;
     }
 
-    public void setActive(byte active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
