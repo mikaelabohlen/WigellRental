@@ -28,6 +28,7 @@ public class Film {
     @Column(name = "release_year", columnDefinition = "default NULL")
     private int releaseYear;
 
+    @OneToOne
     @JoinColumn(name = "language_id", nullable = false)
     private Language language;
 
@@ -54,6 +55,7 @@ public class Film {
     //@Enumerated(EnumType.STRING)
 
     @ElementCollection
+    @CollectionTable(name = "film")
     @Column(name = "special_features", columnDefinition = "SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL")
     private Set<String> specialFeatures;
 
@@ -96,20 +98,20 @@ public class Film {
         this.releaseYear = releaseYear;
     }
 
-    public int getLanguageId() {
-        return languageId;
+    public Language getLanguage() {
+        return language;
     }
 
     public void setLanguageId(int languageId) {
         this.languageId = languageId;
     }
 
-    public int getOriginalLanguageId() {
-        return originalLanguageId;
+    public Language getOriginalLanguage() {
+        return originalLanguage;
     }
 
-    public void setOriginalLanguageId(int originalLanguageId) {
-        this.originalLanguageId = originalLanguageId;
+    public void setOriginalLanguage(Language originalLanguage) {
+        this.originalLanguage = originalLanguage;
     }
 
     public int getRentalDuration() {
@@ -144,11 +146,11 @@ public class Film {
         this.replacementCost = replacementCost;
     }
 
-    public String getRating() {
+    public Rating getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(Rating rating) {
         this.rating = rating;
     }
 
