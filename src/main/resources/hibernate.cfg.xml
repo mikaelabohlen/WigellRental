@@ -20,6 +20,8 @@
         <mapping class="org.example.entities.Address"/>
         <mapping class="org.example.entities.Country"/>
         <mapping class="org.example.entities.City"/>
+        <mapping class="org.example.entities.Film"/>
+
 
     </session-factory>
 </hibernate-configuration>
