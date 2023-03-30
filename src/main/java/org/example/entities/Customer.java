@@ -14,26 +14,26 @@ public class Customer {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "first_name", length = 45, nullable = false)
     private String firstName;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, columnDefinition = "default NULL")
     private String email;
 
     @OneToOne
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(name = "active")
+    @Column(name = "active", nullable = false, columnDefinition = "default '1'")
     private boolean active;
 
-    @Column(name = "create_date")
+    @Column(name = "create_date", nullable = false)
     private Timestamp createDate;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getCustomerId() {

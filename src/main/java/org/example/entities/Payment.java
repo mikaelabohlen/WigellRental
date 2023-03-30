@@ -19,7 +19,7 @@ public class Payment {
     @Column(name = "staff_id", nullable = false)
     private int staffId;
 
-    @Column(name = "rental_id", nullable = false)
+    @Column(name = "rental_id", columnDefinition = "default NULL")
     private int rentalId;
 
     @Column(name = "amount", nullable = false)
@@ -28,7 +28,7 @@ public class Payment {
     @Column(name = "payment_date", nullable = false)
     private Timestamp paymentDate;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getPaymentId() {

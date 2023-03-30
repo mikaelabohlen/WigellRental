@@ -13,34 +13,34 @@ public class Staff {
     @Column(name = "staff_id")
     private int staffId;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "first_name", length = 45, nullable = false)
     private String firstName;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
 
     @Column(name = "address_id", nullable = false)
     private int addressId;
 
-    @Column(name = "picture")
+    @Column(name = "picture", columnDefinition = "default NULL")
     private byte[] picture;
 
-    @Column(length = 40, nullable = false)
+    @Column(length = 40, columnDefinition = "default NULL")
     private String email;
 
     @Column(name = "store_id", nullable = false)
     private int storeId;
 
-    @Column(name = "active")
+    @Column(name = "active", nullable = false, columnDefinition = "default '1'")
     private byte active;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 16, nullable = false)
     private String username;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 40, columnDefinition = "default NULL")
     private String password;
 
-    @Column(name = "last_update", nullable = false)
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getStaffId() {

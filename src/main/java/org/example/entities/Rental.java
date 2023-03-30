@@ -10,22 +10,22 @@ public class Rental {
     @Column(name = "rental_id")
     private int rentalId;
 
-    @Column(name = "rental_date")
+    @Column(name = "rental_date", nullable = false)
     private Timestamp rentalDate;
 
-    @Column(name = "inventory_id")
+    @Column(name = "inventory_id", nullable = false)
     private int inventoryId;
 
-    @Column(name = "customer_id")
+    @Column(name = "customer_id", nullable = false)
     private int customerId;
 
-    @Column(name = "return_date")
+    @Column(name = "return_date", columnDefinition = "default NULL")
     private Timestamp returnDate;
 
-    @Column(name = "staff_id")
+    @Column(name = "staff_id", nullable = false)
     private int staffId;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getRentalId() {

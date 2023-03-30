@@ -12,10 +12,10 @@ public class Language {
     @Column(name = "language_id")
     private int languageId;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 20, nullable = false)
     private String name;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public int getLanguageId() {
