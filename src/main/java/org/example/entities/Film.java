@@ -1,9 +1,6 @@
 package org.example.entities;
 
 import org.example.enums.Rating;
-import org.example.enums.SpecialFeature;
-import org.hibernate.annotations.ManyToAny;
-//import org.hibernate.mapping.Set;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -32,6 +29,7 @@ public class Film {
     @JoinColumn(name = "language_id", nullable = false)
     private Language language;
 
+    @OneToOne
     @JoinColumn(name = "original_language_id", columnDefinition = "default NULL")
     private Language originalLanguage;
 
@@ -102,8 +100,8 @@ public class Film {
         return language;
     }
 
-    public void setLanguageId(int languageId) {
-        this.languageId = languageId;
+    public void setLanguage(Language language) {
+        this.language = language;
     }
 
     public Language getOriginalLanguage() {
@@ -154,11 +152,11 @@ public class Film {
         this.rating = rating;
     }
 
-    public String getSpecialFeatures() {
+    public Set<String> getSpecialFeatures() {
         return specialFeatures;
     }
 
-    public void setSpecialFeatures(String specialFeatures) {
+    public void setSpecialFeatures(Set<String> specialFeatures) {
         this.specialFeatures = specialFeatures;
     }
 

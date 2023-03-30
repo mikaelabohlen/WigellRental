@@ -20,7 +20,15 @@
         <mapping class="org.example.entities.Address"/>
         <mapping class="org.example.entities.Country"/>
         <mapping class="org.example.entities.City"/>
+        <mapping class="org.example.entities.Country"/>
+        <mapping class="org.example.entities.Customer"/>
         <mapping class="org.example.entities.Film"/>
+        <mapping class="org.example.entities.Inventory"/>
+        <mapping class="org.example.entities.Language"/>
+        <mapping class="org.example.entities.Payment"/>
+        <mapping class="org.example.entities.Rental"/>
+        <mapping class="org.example.entities.Staff"/>
+        <mapping class="org.example.entities.Store"/>
 
 
     </session-factory>
