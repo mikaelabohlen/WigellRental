@@ -12,35 +12,36 @@ public class Staff {
     @Id
     @Column(name = "staff_id")
     private int staffId;
-    @Basic
-    @Column(name = "first_name")
+
+
+    @Column(length = 50, nullable = false)
     private String firstName;
-    @Basic
-    @Column(name = "last_name")
+
+    @Column(length = 50, nullable = false)
     private String lastName;
-    @Basic
-    @Column(name = "address_id")
+
+    @Column(name = "address_id", nullable = false)
     private int addressId;
-    @Basic
+
     @Column(name = "picture")
     private byte[] picture;
-    @Basic
-    @Column(name = "email")
+
+    @Column(length = 40, nullable = false)
     private String email;
-    @Basic
-    @Column(name = "store_id")
+
+    @Column(name = "store_id", nullable = false)
     private int storeId;
-    @Basic
+
     @Column(name = "active")
     private byte active;
-    @Basic
-    @Column(name = "username")
+
+    @Column(length = 20, nullable = false)
     private String username;
-    @Basic
-    @Column(name = "password")
+
+    @Column(length = 20, nullable = false)
     private String password;
-    @Basic
-    @Column(name = "last_update")
+
+    @Column(name = "last_update", nullable = false)
     private Timestamp lastUpdate;
 
     public int getStaffId() {
