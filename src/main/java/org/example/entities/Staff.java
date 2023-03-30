@@ -13,7 +13,6 @@ public class Staff {
     @Column(name = "staff_id")
     private int staffId;
 
-
     @Column(length = 50, nullable = false)
     private String firstName;
 
