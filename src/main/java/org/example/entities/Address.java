@@ -17,8 +17,9 @@ public class Address {
     private String address2;
     @Column(length = 20, nullable = false)
     private String district;
-    @Column(name = "city_id", nullable = false) // men om fk är nullable överflödig?
-    private int cityId;
+    @OneToOne
+    @JoinColumn(name = "city_id", nullable = false) // men om fk är nullable överflödig?
+    private City city;
     @Column(name = "postal_code", length = 10)
     private String postalCode;
     @Column(length = 20)
@@ -63,12 +64,12 @@ public class Address {
         this.district = district;
     }
 
-    public int getCityId() {
-        return cityId;
+    public City city() {
+        return city;
     }
 
-    public void setCityId(int cityId) {
-        this.cityId = cityId;
+    public void setCity(City city) {
+        this.city = city;
     }
 
     public String getPostalCode() {
