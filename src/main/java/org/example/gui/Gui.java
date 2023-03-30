@@ -24,6 +24,8 @@ public class Gui {
 
     private Top top;
     private Left left;
+    private Center center;
+
     public Gui(Stage primaryStage, Controller controller) {
         this.primaryStage = primaryStage;
         this.controller = controller;
@@ -46,8 +48,10 @@ public class Gui {
             storeLabel = new Label("Store: ");
 
             choseStoreSubmitButton = new Button("Submit");
+            choseStoreSubmitButton.setFocusTraversable(false);
 
             choseStoreChoiceBox = new ChoiceBox<>();
+            choseStoreChoiceBox.setFocusTraversable(false);
 
             stores = choseStoreChoiceBox.getItems();
             stores.add("Store One");
@@ -75,10 +79,15 @@ public class Gui {
         private ArrayList<Button> navButtons;
         public void setupLeft() {
             moviesButton = new Button("Movies");
+            moviesButton.setFocusTraversable(false);
             rentButton = new Button("Rent");
+            rentButton.setFocusTraversable(false);
             returnButton = new Button("Return");
+            returnButton.setFocusTraversable(false);
             customersButton = new Button("Customers");
+            customersButton.setFocusTraversable(false);
             staffButton = new Button("Staff");
+            staffButton.setFocusTraversable(false);
 
             navButtons = new ArrayList<>();
             navButtons.add(moviesButton);
@@ -96,16 +105,35 @@ public class Gui {
             mainPane.setLeft(buttonVBox);
         }
     }
+
+    private class Center {
+        private Label centerLabel;
+        private VBox centerVBox;
+
+        public void setupCenter() {
+            centerLabel = new Label();
+
+            centerVBox = new VBox();
+            centerVBox.setAlignment(Pos.CENTER);
+            center.centerVBox.getChildren().add(centerLabel);
+
+            mainPane.setCenter(centerVBox);
+        }
+    }
+
     public void launch() {
         top = new Top();
         left = new Left();
+        center = new Center();
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 800, 800);
 
         top.setupTop();
         left.setupLeft();
+        center.setupCenter();
 
+        disableNavButtons();
         buttonActions();
 
         primaryStage.setResizable(false);
@@ -117,6 +145,69 @@ public class Gui {
     private void buttonActions() {
         //TOP
         handleChoseStoreSubmitButton();
+
+        //LEFT
+        handleMoviesButton();
+        handleRentButton();
+        handleReturnButton();
+        handleStaffButton();
+        handleCustomerButton();
+    }
+
+    private void handleCustomerButton() {
+        left.customersButton.setOnMouseClicked(event-> {
+            enableNavButtons();
+            left.customersButton.setDisable(true);
+            center.centerLabel.setText("Customer");
+        });
+    }
+
+    private void handleStaffButton() {
+        left.staffButton.setOnMouseClicked(event-> {
+            enableNavButtons();
+            left.staffButton.setDisable(true);
+            center.centerLabel.setText("Staff");
+        });
+    }
+
+    private void handleReturnButton() {
+        left.returnButton.setOnMouseClicked(event-> {
+            enableNavButtons();
+            left.returnButton.setDisable(true);
+            center.centerLabel.setText("Return");
+        });
+    }
+
+    private void handleRentButton() {
+        left.rentButton.setOnMouseClicked(event-> {
+            enableNavButtons();
+            left.rentButton.setDisable(true);
+            center.centerLabel.setText("Rent");
+        });
+    }
+
+    private void handleMoviesButton() {
+        left.moviesButton.setOnMouseClicked(event-> {
+            enableNavButtons();
+            left.moviesButton.setDisable(true);
+            center.centerLabel.setText("Movies");
+        });
+    }
+
+    private void enableNavButtons() {
+        left.moviesButton.setDisable(false);
+        left.rentButton.setDisable(false);
+        left.returnButton.setDisable(false);
+        left.customersButton.setDisable(false);
+        left.staffButton.setDisable(false);
+    }
+
+    private void disableNavButtons() {
+        left.moviesButton.setDisable(true);
+        left.rentButton.setDisable(true);
+        left.returnButton.setDisable(true);
+        left.customersButton.setDisable(true);
+        left.staffButton.setDisable(true);
     }
 
     private void handleChoseStoreSubmitButton() {
@@ -127,9 +218,11 @@ public class Gui {
             }
             if(top.choseStoreChoiceBox.getValue().equals("Store One")) {
                 top.storeLabel.setText("Store: 'Store One'");
+                enableNavButtons();
             }
             else {
                 top.storeLabel.setText("Store: 'Store Two'");
+                enableNavButtons();
             }
         });
     }
