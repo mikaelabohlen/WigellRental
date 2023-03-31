@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import org.example.enums.Rating;
+import org.example.utils.RatingConverter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -44,7 +45,8 @@ public class Film {
 
     @Column(name = "replacement_cost", nullable = false, precision = 5, scale = 2, columnDefinition = "default 19.99")
     private BigDecimal replacementCost;
-    @Enumerated(EnumType.STRING)
+
+    @Convert(converter = RatingConverter.class)
     @Column(columnDefinition = "default 'G'")
     private Rating rating;
 

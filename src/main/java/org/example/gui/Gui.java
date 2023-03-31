@@ -1,17 +1,22 @@
 package org.example.gui;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Controller;
+import org.example.dao.FilmDAO;
+import org.example.entities.Film;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Gui {
 
@@ -109,12 +114,32 @@ public class Gui {
     private class Center {
         private Label centerLabel;
         private VBox centerVBox;
-
+        private TableView table;
+        private ObservableList<Film> observableList;
         public void setupCenter() {
             centerLabel = new Label();
+            FilmDAO filmDAO = new FilmDAO();
+
+            List<Film> films = filmDAO.getAll();
+            observableList = FXCollections.observableList(films);
+
+            for(int i=0; i<films.size(); i++) {
+                System.out.println(films.get(i).getTitle());
+            }
+
+            table = new TableView<Film>();
+            TableColumn<Film, String> titleColumn = new TableColumn<Film, String>("Title:");
+            titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+            TableColumn<Film, Integer> releaseYearColumn = new TableColumn<Film, Integer>("Release Year:");
+            releaseYearColumn.setCellValueFactory(new PropertyValueFactory<>("releaseYear"));
+            table.getColumns().add(titleColumn);
+            table.getColumns().add(releaseYearColumn);
+            table.getItems().addAll(observableList);
 
             centerVBox = new VBox();
-            centerVBox.setAlignment(Pos.CENTER);
+            centerVBox.setAlignment(Pos.TOP_CENTER);
+            centerVBox.setPadding(new Insets(10,10,10,10));
+            centerVBox.setSpacing(10);
             center.centerVBox.getChildren().add(centerLabel);
 
             mainPane.setCenter(centerVBox);
@@ -190,7 +215,8 @@ public class Gui {
         left.moviesButton.setOnMouseClicked(event-> {
             enableNavButtons();
             left.moviesButton.setDisable(true);
-            center.centerLabel.setText("Movies");
+            center.centerVBox.getChildren().clear();
+            center.centerVBox.getChildren().add(center.table);
         });
     }
 
