@@ -13,14 +13,17 @@ public class Payment {
     @Column(name = "payment_id")
     private int paymentId;
 
-    @Column(name = "customer_id", nullable = false)
-    private int customerId;
+    @OneToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
-    @Column(name = "staff_id", nullable = false)
-    private int staffId;
+    @OneToOne
+    @JoinColumn(name = "staff_id", nullable = false)
+    private Staff staff;
 
-    @Column(name = "rental_id", columnDefinition = "default NULL")
-    private int rentalId;
+    @OneToOne
+    @JoinColumn(name = "rental_id", columnDefinition = "default NULL")
+    private Rental rental;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
@@ -39,28 +42,28 @@ public class Payment {
         this.paymentId = paymentId;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+    public void setCustomerId(Customer customer) {
+        this.customer = customer;
     }
 
-    public int getStaffId() {
-        return staffId;
+    public Staff getStaff() {
+        return staff;
     }
 
-    public void setStaffId(int staffId) {
-        this.staffId = staffId;
+    public void setStaffId(Staff staff) {
+        this.staff = staff;
     }
 
-    public int getRentalId() {
-        return rentalId;
+    public Rental getRental() {
+        return rental;
     }
 
-    public void setRentalId(int rentalId) {
-        this.rentalId = rentalId;
+    public void setRentalId(Rental rental) {
+        this.rental = rental;
     }
 
     public BigDecimal getAmount() {
