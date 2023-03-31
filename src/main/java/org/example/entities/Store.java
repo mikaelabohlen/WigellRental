@@ -12,11 +12,13 @@ public class Store {
     @Column(name = "store_id")
     private int storeId;
 
-    @Column(name = "manager_staff_id", nullable = false)
-    private int managerStaffId;
+    @OneToOne
+    @JoinColumn(name = "manager_staff_id", nullable = false)
+    private Staff managerStaff;
 
-    @Column(name = "address_id", nullable = false)
-    private int addressId;
+    @OneToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
@@ -29,20 +31,20 @@ public class Store {
         this.storeId = storeId;
     }
 
-    public int getManagerStaffId() {
-        return managerStaffId;
+    public Staff getManagerStaff() {
+        return managerStaff;
     }
 
-    public void setManagerStaffId(int managerStaffId) {
-        this.managerStaffId = managerStaffId;
+    public void setManagerStaffId(Staff managerStaff) {
+        this.managerStaff = managerStaff;
     }
 
-    public int getAddressId() {
-        return addressId;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
+    public void setAddressId(Address address) {
+        this.address = address;
     }
 
     public Timestamp getLastUpdate() {
