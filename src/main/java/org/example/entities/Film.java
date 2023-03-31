@@ -47,16 +47,9 @@ public class Film {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "default 'G'")
     private Rating rating;
-//    @Column(length = 50, nullable = false)
-//    private String specialFeatures; //idk what type this should actually be?
 
-    //@Enumerated(EnumType.STRING)
-
-    @ElementCollection
-    @CollectionTable(name = "film")
     @Column(name = "special_features", columnDefinition = "SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL")
-    private Set<String> specialFeatures;
-
+    private String specialFeatures;
 
     @Column(name = "last_update")
     private Timestamp lastUpdate;
@@ -158,11 +151,11 @@ public class Film {
         this.rating = rating;
     }
 
-    public Set<String> getSpecialFeatures() {
+    public String getSpecialFeatures() {
         return specialFeatures;
     }
 
-    public void setSpecialFeatures(Set<String> specialFeatures) {
+    public void setSpecialFeatures(String specialFeatures) {
         this.specialFeatures = specialFeatures;
     }
 

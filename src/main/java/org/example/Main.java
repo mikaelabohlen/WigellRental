@@ -21,6 +21,20 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         controller = new Controller();
 
+        // För att kontrollera att det går att hämta lägga till specialfatures
+//        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+//        Session session = sessionFactory.openSession();
+//        session.getTransaction().begin();
+//
+//        Film film = session.get(Film.class, 1);
+//        System.out.println(film.getSpecialFeatures());
+//        film.setSpecialFeatures("Deleted Scenes,Behind the Scenes");
+//
+//        session.update(film);
+//        session.getTransaction().commit();
+//        session.close();
+
+
         gui = new Gui(primaryStage, controller);
 
         gui.launch();
