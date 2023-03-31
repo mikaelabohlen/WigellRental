@@ -19,8 +19,9 @@ public class Staff {
     @Column(name = "last_name", length = 45, nullable = false)
     private String lastName;
 
-    @Column(name = "address_id", nullable = false)
-    private int addressId;
+    @OneToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
 
     @Column(name = "picture", columnDefinition = "default NULL")
     private byte[] picture;
@@ -28,8 +29,9 @@ public class Staff {
     @Column(length = 40, columnDefinition = "default NULL")
     private String email;
 
-    @Column(name = "store_id", nullable = false)
-    private int storeId;
+    @OneToOne // Ska denna rel ändras? ska en staff kunna jobba i flera butiker? Men isf jointable och så ser itne databasen ut.
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @Column(name = "active", nullable = false, columnDefinition = "default '1'")
     private byte active;
@@ -67,12 +69,12 @@ public class Staff {
         this.lastName = lastName;
     }
 
-    public int getAddressId() {
-        return addressId;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
+    public void setAddressId(Address address) {
+        this.address = address;
     }
 
     public byte[] getPicture() {
@@ -91,12 +93,12 @@ public class Staff {
         this.email = email;
     }
 
-    public int getStoreId() {
-        return storeId;
+    public Store getStore() {
+        return store;
     }
 
-    public void setStoreId(int storeId) {
-        this.storeId = storeId;
+    public void setStoreId(Store store) {
+        this.store = store;
     }
 
     public byte getActive() {
