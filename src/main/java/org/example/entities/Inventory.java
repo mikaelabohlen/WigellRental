@@ -11,11 +11,13 @@ public class Inventory {
     @Column(name = "inventory_id")
     private int inventoryId;
 
+    @OneToOne
     @JoinColumn(name = "film_id", nullable = false)
-    private int filmId;
+    private Film film;
 
+    @OneToOne
     @JoinColumn(name = "store_id", nullable = false)
-    private int storeId;
+    private Store store;
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
@@ -28,20 +30,20 @@ public class Inventory {
         this.inventoryId = inventoryId;
     }
 
-    public int getFilmId() {
-        return filmId;
+    public Film getFilm() {
+        return film;
     }
 
-    public void setFilmId(int filmId) {
-        this.filmId = filmId;
+    public void setFilmId(Film film) {
+        this.film = film;
     }
 
-    public int getStoreId() {
-        return storeId;
+    public Store getStore() {
+        return store;
     }
 
-    public void setStoreId(int storeId) {
-        this.storeId = storeId;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public Timestamp getLastUpdate() {
