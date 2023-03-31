@@ -11,19 +11,22 @@ public class Rental {
     private int rentalId;
 
     @Column(name = "rental_date", nullable = false)
-    private Timestamp rentalDate;
+    private Timestamp rentalDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
 
-    @Column(name = "inventory_id", nullable = false)
-    private int inventoryId;
+    @OneToOne
+    @JoinColumn(name = "inventory_id", nullable = false)
+    private Inventory inventory;
 
-    @Column(name = "customer_id", nullable = false)
-    private int customerId;
+    @OneToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(name = "return_date", columnDefinition = "default NULL")
-    private Timestamp returnDate;
+    private Timestamp returnDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
 
-    @Column(name = "staff_id", nullable = false)
-    private int staffId;
+    @OneToOne
+    @JoinColumn(name = "staff_id", nullable = false)
+    private Staff staff;
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
@@ -44,20 +47,20 @@ public class Rental {
         this.rentalDate = rentalDate;
     }
 
-    public int getInventoryId() {
-        return inventoryId;
+    public Inventory getInventoryId() {
+        return inventory;
     }
 
-    public void setInventoryId(int inventoryId) {
-        this.inventoryId = inventoryId;
+    public void setInventoryId(Inventory inventory) {
+        this.inventory = inventory;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+    public void setCustomerId(Customer customer) {
+        this.customer = customer;
     }
 
     public Timestamp getReturnDate() {
@@ -68,12 +71,12 @@ public class Rental {
         this.returnDate = returnDate;
     }
 
-    public int getStaffId() {
-        return staffId;
+    public Staff getStaff() {
+        return staff;
     }
 
-    public void setStaffId(int staffId) {
-        this.staffId = staffId;
+    public void setStaffId(Staff staff) {
+        this.staff = staff;
     }
 
     public Timestamp getLastUpdate() {
