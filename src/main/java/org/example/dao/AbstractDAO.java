@@ -4,6 +4,8 @@ import org.example.utils.SessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import java.util.List;
+
 public abstract class AbstractDAO<T> {
 
     private final Class<T> entityClass;
@@ -28,6 +30,15 @@ public abstract class AbstractDAO<T> {
             T entity = session.get(entityClass, id);
             session.getTransaction().commit();
             return entity;
+        }
+    }
+
+    public List<T> getAll() {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+            List<T> entities = session.createQuery("FROM " + entityClass.getName(), entityClass).getResultList();
+            session.getTransaction().commit();
+            return entities;
         }
     }
 
