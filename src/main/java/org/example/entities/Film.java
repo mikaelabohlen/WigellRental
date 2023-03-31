@@ -36,7 +36,7 @@ public class Film {
     @Column(name = "rental_duration", nullable = false, columnDefinition = "default 3")
     private int rentalDuration;
 
-    @Column(name = "rental_rate", nullable = false, precision = 4,scale = 2, columnDefinition = "default 4.99")
+    @Column(name = "rental_rate", nullable = false, precision = 4, scale = 2, columnDefinition = "default 4.99")
     private BigDecimal rentalRate;
 
     @Column(columnDefinition = "default NULL")
@@ -61,8 +61,14 @@ public class Film {
     @Column(name = "last_update")
     private Timestamp lastUpdate;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "films")
     private List<Actor> actors;
+
+    @ManyToMany
+    @JoinTable(name = "film_category",
+            joinColumns = {@JoinColumn (name = "film_id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")})
+    private List<Category> categories;
 
     public int getFilmId() {
         return filmId;
@@ -168,5 +174,19 @@ public class Film {
         this.lastUpdate = lastUpdate;
     }
 
+    public List<Actor> getActors() {
+        return actors;
+    }
 
+    public void setActors(List<Actor> actors) {
+        this.actors = actors;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
 }
