@@ -11,10 +11,10 @@ public class Inventory {
     @Column(name = "inventory_id")
     private int inventoryId;
 
-    @Column(name = "film_id", nullable = false)
+    @JoinColumn(name = "film_id", nullable = false)
     private int filmId;
 
-    @Column(name = "store_id", nullable = false)
+    @JoinColumn(name = "store_id", nullable = false)
     private int storeId;
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
