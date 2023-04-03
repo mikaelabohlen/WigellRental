@@ -33,41 +33,14 @@ public class FilmService {
     }
 
     public FilmDTO addFilm(FilmDTO filmDTO){  //filmDTOToFilm
-        Film film = new Film();
-        transferAttribute(filmDTO, film);
+        Film film = filmDTO.toEntity();
         filmDAO.create(film);
         return FilmDTO.fromEntity(film);
     }
-    public void updateFilm(FilmDTO filmDTO){  //filmDTOToFilm
-        Film film = filmDAO.read(filmDTO.getFilmId());
-        transferAttribute(filmDTO, film);
-        filmDAO.create(film);
-        System.out.println(film.getFilmId());
-    }
-
-    private void transferAttribute(FilmDTO filmDTO, Film film) {
-        film.setTitle(filmDTO.getTitle());
-        film.setDescription(filmDTO.getDescription());
-        film.setReleaseYear(filmDTO.getReleaseYear());
-        film.setLanguage(getLanguage(filmDTO.getLanguage()));
-        film.setOriginalLanguage(getLanguage(filmDTO.getOriginalLanguage()));
-        film.setRentalDuration(filmDTO.getRentalDuration());
-        film.setRentalRate(filmDTO.getRentalRate());
-        film.setLength(filmDTO.getLength());
-        film.setReplacementCost(filmDTO.getReplacementCost());
-        film.setRating(filmDTO.getRating());
-        film.setSpecialFeatures(filmDTO.getSpecialFeatures());
-        film.setLastUpdate(filmDTO.getLastUpdate());
-        film.setActors(filmDTO.getActors());
-        film.setCategories(filmDTO.getCategories());
-    }
-
-    public Language getLanguage(LanguageDTO languageDTO){
-        Language language = new Language();
-        language.setLanguageId(languageDTO.getLanguageId());
-        language.setName(languageDTO.getName());
-        language.setLastUpdate(languageDTO.getLastUpdate());
-        return language;
+    public FilmDTO updateFilm(FilmDTO filmDTO){  //filmDTOToFilm
+        Film film = filmDTO.toEntity();
+        filmDAO.update(film);
+        return FilmDTO.fromEntity(film);
     }
 
 }

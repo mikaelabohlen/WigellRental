@@ -20,6 +20,14 @@ public class LanguageDTO {
     static LanguageDTO fromEntity(Language language) {
         return new LanguageDTO(language.getLanguageId(), language.getName(), language.getLastUpdate());
     }
+
+    public Language toEntity(){
+        Language language = new Language();
+        language.setLanguageId(this.getLanguageId());
+        language.setName(this.getName());
+        language.setLastUpdate(this.getLastUpdate());
+        return language;
+    }
     public int getLanguageId() {
         return languageId;
     }

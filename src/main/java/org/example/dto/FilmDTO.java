@@ -81,7 +81,26 @@ public class FilmDTO {
                 film.getCategories()
         );
     }
-
+    public Film toEntity(){
+        Film film = new Film();
+        film.setFilmId(this.getFilmId());
+        film.setTitle(this.getTitle());
+        film.setDescription(this.getDescription());
+        film.setReleaseYear(this.getReleaseYear());
+        film.setLanguage(this.getLanguage().toEntity());
+        film.setOriginalLanguage(this.getOriginalLanguage().toEntity());
+        film.setRentalDuration(this.getRentalDuration());
+        film.setRentalRate(this.getRentalRate());
+        film.setLength(this.getLength());
+        film.setReplacementCost(this.getReplacementCost());
+        film.setRating(this.getRating());
+        film.setSpecialFeatures(this.getSpecialFeatures());
+        film.setLastUpdate(this.getLastUpdate());
+        film.setActors(this.getActors());
+        film.setCategories(this.getCategories());
+        return film;
+    }
+    
     public Integer getFilmId() {
         return filmId;
     }
