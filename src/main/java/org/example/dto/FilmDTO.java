@@ -3,6 +3,7 @@ package org.example.dto;
 import org.example.dao.FilmDAO;
 import org.example.entities.Actor;
 import org.example.entities.Category;
+import org.example.entities.Film;
 import org.example.entities.Language;
 import org.example.enums.Rating;
 
@@ -12,38 +13,38 @@ import java.util.List;
 
 
 public class FilmDTO {
-
-    private int filmId;
-
+    private Integer filmId;
     private String title;
-
     private String description;
-
-    private int releaseYear;
-
-    private Language language;
-
-    private Language originalLanguage;
-
-    private int rentalDuration;
-
+    private Integer releaseYear;
+    private LanguageDTO language;
+    private LanguageDTO originalLanguage;
+    private Integer rentalDuration;
     private BigDecimal rentalRate;
-
-    private int length;
-
+    private Integer length;
     private BigDecimal replacementCost;
-
     private Rating rating;
-
     private String specialFeatures;
-
     private Timestamp lastUpdate;
-
     private List<Actor> actors;
-
     private List<Category> categories;
 
-    public FilmDTO(int filmId, String title, String description, int releaseYear, Language language, Language originalLanguage, int rentalDuration, BigDecimal rentalRate, int length, BigDecimal replacementCost, Rating rating, String specialFeatures, Timestamp lastUpdate, List<Actor> actors, List<Category> categories) {
+    public FilmDTO(
+            Integer filmId,
+            String title,
+            String description,
+            Integer releaseYear,
+            LanguageDTO language,
+            LanguageDTO originalLanguage,
+            Integer rentalDuration,
+            BigDecimal rentalRate,
+            Integer length,
+            BigDecimal replacementCost,
+            Rating rating,
+            String specialFeatures,
+            Timestamp lastUpdate,
+            List<Actor> actors,
+            List<Category> categories) {
         this.filmId = filmId;
         this.title = title;
         this.description = description;
@@ -61,7 +62,27 @@ public class FilmDTO {
         this.categories = categories;
     }
 
-    public int getFilmId() {
+    public static FilmDTO fromEntity(Film film) {
+        return new FilmDTO(
+                film.getFilmId(),
+                film.getTitle(),
+                film.getDescription(),
+                film.getReleaseYear(),
+                LanguageDTO.fromEntity(film.getLanguage()),
+                LanguageDTO.fromEntity(film.getOriginalLanguage()),
+                film.getRentalDuration(),
+                film.getRentalRate(),
+                film.getLength(),
+                film.getReplacementCost(),
+                film.getRating(),
+                film.getSpecialFeatures(),
+                film.getLastUpdate(),
+                film.getActors(),
+                film.getCategories()
+        );
+    }
+
+    public Integer getFilmId() {
         return filmId;
     }
 
@@ -73,19 +94,19 @@ public class FilmDTO {
         return description;
     }
 
-    public int getReleaseYear() {
+    public Integer getReleaseYear() {
         return releaseYear;
     }
 
-    public Language getLanguage() {
+    public LanguageDTO getLanguage() {
         return language;
     }
 
-    public Language getOriginalLanguage() {
+    public LanguageDTO getOriginalLanguage() {
         return originalLanguage;
     }
 
-    public int getRentalDuration() {
+    public Integer getRentalDuration() {
         return rentalDuration;
     }
 
@@ -93,7 +114,7 @@ public class FilmDTO {
         return rentalRate;
     }
 
-    public int getLength() {
+    public Integer getLength() {
         return length;
     }
 

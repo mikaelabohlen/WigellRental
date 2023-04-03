@@ -28,7 +28,7 @@ public class Film {
     private int releaseYear;
 
     @OneToOne
-    @JoinColumn(name = "language_id", nullable = false)
+    @JoinColumn(name = "language_id", nullable = true) //Todo: nullable ska vara false, testar bara nu
     private Language language;
 
     @OneToOne
@@ -54,7 +54,7 @@ public class Film {
     @Column(name = "special_features", columnDefinition = "SET('Trailers','Commentaries','Deleted Scenes','Behind the Scenes') DEFAULT NULL")
     private String specialFeatures;
 
-    @Column(name = "last_update")
+    @Column(name = "last_update", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     @ManyToMany(mappedBy = "films", fetch = FetchType.EAGER)
