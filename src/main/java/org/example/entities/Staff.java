@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-
+@Table(name = "staff")
 public class Staff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

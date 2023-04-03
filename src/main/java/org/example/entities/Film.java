@@ -12,6 +12,7 @@ import java.util.*;
 
 
 @Entity
+@Table(name = "film")
 public class Film {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -67,6 +68,11 @@ public class Film {
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
     private List<Category> categories;
+
+//    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+//    private List<Inventory> inventories;
+    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+    private Set<Inventory> inventories;
 
     public int getFilmId() {
         return filmId;
@@ -186,5 +192,13 @@ public class Film {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+
+    public Set<Inventory> getInventories() {
+        return inventories;
+    }
+
+    public void setInventories(Set<Inventory> inventories) {
+        this.inventories = inventories;
     }
 }
