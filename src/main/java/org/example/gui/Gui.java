@@ -8,15 +8,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Controller;
 import org.example.dao.FilmDAO;
+import org.example.entities.Actor;
+import org.example.entities.Category;
 import org.example.entities.Film;
+import org.example.enums.Rating;
+import org.example.utils.TimeUtil;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Gui {
 
@@ -113,28 +120,114 @@ public class Gui {
 
     private class Center {
         private Label centerLabel;
+        private Label titleLabel, descriptionLabel, releaseYearLabel, lengthLabel, ratingLabel, specialFeaturesLabel, actorsLabel;
+        private TextField titleTextField, releaseYearTextField, lengthTextField, ratingTextField, specialFeaturesTextField;
+        private TextArea descriptionTextArea, actorsTextArea;
+        private GridPane labelsTextFieldsGridPane;
         private VBox centerVBox;
-        private TableView table;
-        private ObservableList<Film> observableList;
+        private TableView filmTable;
+        private ObservableList<Film> filmObservableList;
         public void setupCenter() {
             centerLabel = new Label();
+            titleLabel = new Label("Title:");
+            descriptionLabel = new Label("Description:");
+            releaseYearLabel = new Label("Release Year:");
+            lengthLabel = new Label("Length:");
+            ratingLabel = new Label("Rating:");
+            specialFeaturesLabel = new Label("Special Features:");
+            actorsLabel = new Label("Actors:");
+
+            titleTextField = new TextField();
+            releaseYearTextField = new TextField();
+            lengthTextField = new TextField();
+            ratingTextField = new TextField(); //TODO Detta skall vara en ChoiceBox
+            specialFeaturesTextField = new TextField();
+
+            descriptionTextArea = new TextArea();
+            descriptionTextArea.setMaxHeight(100);
+            descriptionTextArea.setMaxWidth(200);
+            descriptionTextArea.setWrapText(true);
+
+            actorsTextArea = new TextArea();
+            actorsTextArea.setMaxHeight(100);
+            actorsTextArea.setMaxWidth(200);
+            actorsTextArea.setWrapText(true);
+
+            labelsTextFieldsGridPane = new GridPane();
+            labelsTextFieldsGridPane.setHgap(10);
+            labelsTextFieldsGridPane.setVgap(10);
+            labelsTextFieldsGridPane.add(titleLabel,0,0,1,1);
+            labelsTextFieldsGridPane.add(titleTextField,1,0,1,1);
+            labelsTextFieldsGridPane.add(releaseYearLabel, 2,0,1,1);
+            labelsTextFieldsGridPane.add(releaseYearTextField, 3,0,1,1);
+            labelsTextFieldsGridPane.add(lengthLabel, 4,0,1,1);
+            labelsTextFieldsGridPane.add(lengthTextField, 5,0,1,1);
+            labelsTextFieldsGridPane.add(ratingLabel, 6,0,1,1);
+            labelsTextFieldsGridPane.add(ratingTextField, 7,0,1,1);
+            labelsTextFieldsGridPane.add(specialFeaturesLabel, 0,1,1,1);
+            labelsTextFieldsGridPane.add(specialFeaturesTextField, 1,1,2,1);
+            labelsTextFieldsGridPane.add(descriptionLabel, 0,2,1,1);
+            labelsTextFieldsGridPane.add(descriptionTextArea, 1,2,1,1);
+            labelsTextFieldsGridPane.add(actorsLabel,2,2,1,1);
+            labelsTextFieldsGridPane.add(actorsTextArea,3,2,1,1);
+
             FilmDAO filmDAO = new FilmDAO();
 
             List<Film> films = filmDAO.getAll();
-            observableList = FXCollections.observableList(films);
+            filmObservableList = FXCollections.observableList(films);
 
-            for(int i=0; i<films.size(); i++) {
-                System.out.println(films.get(i).getTitle());
-            }
-
-            table = new TableView<Film>();
+            filmTable = new TableView<Film>();
+            filmTable.setFocusTraversable(false);
             TableColumn<Film, String> titleColumn = new TableColumn<Film, String>("Title:");
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
             TableColumn<Film, Integer> releaseYearColumn = new TableColumn<Film, Integer>("Release Year:");
             releaseYearColumn.setCellValueFactory(new PropertyValueFactory<>("releaseYear"));
-            table.getColumns().add(titleColumn);
-            table.getColumns().add(releaseYearColumn);
-            table.getItems().addAll(observableList);
+            TableColumn<Film, Integer> lengthColumn = new TableColumn<Film, Integer>("Length:");
+            lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
+            lengthColumn.setCellFactory(column-> formatTimeInTableViewCell());
+            TableColumn<Film, Rating> ratingColumn = new TableColumn<Film, Rating>("Rating:");
+            ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
+            TableColumn<Film, Timestamp> timeStampColumn = new TableColumn<Film, Timestamp>("Last Update");
+            timeStampColumn.setCellValueFactory(new PropertyValueFactory<>("lastUpdate"));
+            TableColumn<Film, List<Category>> categoryColumn = new TableColumn<Film, List<Category>>("Kategori");
+            categoryColumn.setCellValueFactory(new PropertyValueFactory<>("categories"));
+            categoryColumn.setCellFactory(column -> new TableCell<Film, List<Category>>() {
+                @Override
+                protected void updateItem(List<Category> categories, boolean empty) {
+                    super.updateItem(categories, empty);
+                    if (empty || categories == null) {
+                        setText("");
+                    } else {
+                        setText(categories.stream().map(Category::getName).collect(Collectors.joining(", ")));
+                    }
+                }
+            });
+
+            TableColumn<Film, List<Actor>> actorsColumn = new TableColumn<Film, List<Actor>>("Actors:");
+            actorsColumn.setCellValueFactory(new PropertyValueFactory<>("actors"));
+            actorsColumn.setCellFactory(column -> new TableCell<Film, List<Actor>>() {
+                @Override
+                protected void updateItem(List<Actor> actors, boolean empty) {
+                    super.updateItem(actors, empty);
+                    if (empty || actors == null) {
+                        setText("");
+                    } else {
+                        setText(actors.stream().map(actor -> actor.getFirstName() + " " + actor.getLastName()).collect(Collectors.joining(", ")));
+                    }
+                }
+            });
+
+            filmTable.setMaxWidth(800);
+            filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+            filmTable.getColumns().add(titleColumn);
+            filmTable.getColumns().add(releaseYearColumn);
+            filmTable.getColumns().add(lengthColumn);
+            filmTable.getColumns().add(ratingColumn);
+            filmTable.getColumns().add(timeStampColumn);
+            filmTable.getColumns().add(categoryColumn);
+            filmTable.getColumns().add(actorsColumn);
+            filmTable.getItems().addAll(filmObservableList);
 
             centerVBox = new VBox();
             centerVBox.setAlignment(Pos.TOP_CENTER);
@@ -152,7 +245,7 @@ public class Gui {
         center = new Center();
 
         mainPane = new BorderPane();
-        mainScene = new Scene(mainPane, 800, 800);
+        mainScene = new Scene(mainPane, 1200, 1000);
 
         top.setupTop();
         left.setupLeft();
@@ -177,6 +270,9 @@ public class Gui {
         handleReturnButton();
         handleStaffButton();
         handleCustomerButton();
+
+        //CENTER
+        handleFilmTable();
     }
 
     private void handleCustomerButton() {
@@ -216,7 +312,7 @@ public class Gui {
             enableNavButtons();
             left.moviesButton.setDisable(true);
             center.centerVBox.getChildren().clear();
-            center.centerVBox.getChildren().add(center.table);
+            center.centerVBox.getChildren().addAll(center.filmTable, center.labelsTextFieldsGridPane);
         });
     }
 
@@ -251,5 +347,34 @@ public class Gui {
                 enableNavButtons();
             }
         });
+    }
+
+    private void handleFilmTable() {
+        center.filmTable.setOnMousePressed(event -> {
+            Film selectedFilm = (Film) center.filmTable.getSelectionModel().getSelectedItem();
+            if (selectedFilm != null) {
+                center.titleTextField.setText(selectedFilm.getTitle());
+                center.releaseYearTextField.setText(String.valueOf(selectedFilm.getReleaseYear()));
+                center.lengthTextField.setText(TimeUtil.formatTimeMinutesToHourMinutes(selectedFilm.getLength()));
+                center.ratingTextField.setText(selectedFilm.getRating().toString());
+                center.specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
+                center.descriptionTextArea.setText(selectedFilm.getDescription());
+            }
+        });
+    }
+
+    private TableCell<Film, Integer> formatTimeInTableViewCell() {
+        return new TableCell<Film, Integer>() {
+            @Override
+            protected void updateItem(Integer minutes, boolean empty) {
+                super.updateItem(minutes, empty);
+                if(empty || minutes == null) {
+                    setText(null);
+                }
+                else {
+                    setText(TimeUtil.formatTimeMinutesToHourMinutes(minutes));
+                }
+            }
+        };
     }
 }

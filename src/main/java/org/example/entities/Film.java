@@ -2,6 +2,8 @@ package org.example.entities;
 
 import org.example.enums.Rating;
 import org.example.utils.RatingConverter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -10,7 +12,6 @@ import java.util.*;
 
 
 @Entity
-
 public class Film {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -56,10 +57,12 @@ public class Film {
     @Column(name = "last_update")
     private Timestamp lastUpdate;
 
-    @ManyToMany(mappedBy = "films")
+    @ManyToMany(mappedBy = "films", fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Actor> actors;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     @JoinTable(name = "film_category",
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
