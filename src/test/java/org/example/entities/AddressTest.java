@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 class AddressTest {
-
     AddressDAO addressDAO = new AddressDAO();
     @Test
     void getAllAddress() {
