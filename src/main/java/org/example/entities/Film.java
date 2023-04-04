@@ -61,12 +61,11 @@ public class Film {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Actor> actors;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "film_category",
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
-    private List<Category> categories;
+    private Category category;
 
     public int getFilmId() {
         return filmId;
@@ -180,11 +179,11 @@ public class Film {
         this.actors = actors;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
