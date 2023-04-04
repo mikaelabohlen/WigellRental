@@ -88,4 +88,12 @@ public class Rental {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        if(this.returnDate == null){
+            return "RentalId=" + rentalId + " rented: " + rentalDate;
+        }else{
+            return "RentalId=" + rentalId + " rented: " + rentalDate + ", returned: "+returnDate;
+        }
+    }
 }
