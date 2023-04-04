@@ -1,14 +1,13 @@
 package org.example.dao;
 
 import org.example.entities.Address;
-import org.example.entities.City;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
-public class AdressDAO extends AbstractDAO<Address> {
-    public AdressDAO() {
+public class AddressDAO extends AbstractDAO<Address> {
+    public AddressDAO() {
         super(Address.class);
     }
 

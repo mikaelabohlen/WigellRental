@@ -1,11 +1,6 @@
 package org.example.entities;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geolatte.geom.GeometryType;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,8 +9,6 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "address")
-@TypeDefs({
-        @TypeDef(name = "geometry", typeClass = GeometryType.class)})
 public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,13 +29,8 @@ public class Address implements Serializable {
     @Column(length = 20)
     private String phone;
 
-    @Transient
-    GeometryFactory geometryFactory = new GeometryFactory();
-
-    //Todo: Den här ger invalid stream header som fel.
-//    @Column(nullable = false)
-//    @Type(type = "geometry")
-//    private Geometry location; // blir detta rätt? Dependency tillagt i pom-filen
+    @Column(nullable = false)
+    private Geometry location;
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
@@ -107,13 +95,13 @@ public class Address implements Serializable {
     }
 
 
-//    public Geometry getLocation() {
-//        return location;
-//    }
-//
-//    public void setLocation(Geometry location) {
-//        this.location = location;
-//    }
+    public Geometry getLocation() {
+        return location;
+    }
+
+    public void setLocation(Geometry location) {
+        this.location = location;
+    }
 
     public Timestamp getLastUpdate() {
         return lastUpdate;
