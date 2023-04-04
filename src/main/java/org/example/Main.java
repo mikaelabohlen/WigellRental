@@ -2,6 +2,7 @@ package org.example;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.example.dao.*;
 import org.example.entities.Film;
 import org.example.gui.Gui;
 import org.hibernate.Session;
@@ -19,21 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        controller = new Controller();
-
-        // För att kontrollera att det går att hämta lägga till specialfatures
-//        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-//        Session session = sessionFactory.openSession();
-//        session.getTransaction().begin();
-//
-//        Film film = session.get(Film.class, 1);
-//        System.out.println(film.getSpecialFeatures());
-//        film.setSpecialFeatures("Deleted Scenes,Behind the Scenes");
-//
-//        session.update(film);
-//        session.getTransaction().commit();
-//        session.close();
-
+        controller = new Controller(new ActorDAO(), new AddressDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
 
         gui = new Gui(primaryStage, controller);
 

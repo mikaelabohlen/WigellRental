@@ -12,6 +12,7 @@ import java.util.*;
 
 
 @Entity
+@Table(name = "film")
 public class Film {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -66,6 +67,13 @@ public class Film {
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
     private Category category;
+
+
+//    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+//    private List<Inventory> inventories;
+    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+    private Set<Inventory> inventories;
+
 
     public int getFilmId() {
         return filmId;
@@ -181,9 +189,44 @@ public class Film {
 
     public Category getCategory() {
         return category;
+
     }
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Set<Inventory> getInventories() {
+        return inventories;
+    }
+
+    public void setInventories(Set<Inventory> inventories) {
+        this.inventories = inventories;
+    }
+
+    public Integer getTotalStock(int storeId){
+        int totalStock = 0;
+        for(Inventory inventory: this.getInventories()){
+            if(inventory.getStore().getStoreId() == storeId){
+                totalStock ++;
+            }
+        }
+        return totalStock;
+
+    }
+    public Integer getInStock(int storeId){
+        int inStock = 0;
+        boolean rented;
+
+    public void setCategory(Category category) {
+        this.category = category;
+
+        for(Inventory inventory: this.getInventories()){
+            rented = inventory.getRental().getReturnDate() == null;
+            if(inventory.getStore().getStoreId() == storeId && !rented){
+                inStock ++;
+            }
+        }
+        return inStock;
     }
 }

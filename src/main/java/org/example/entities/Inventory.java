@@ -2,16 +2,16 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 @Entity
+@Table(name = "inventory")
 public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "inventory_id")
-    private int inventoryId;
+    private Integer inventoryId;
 
-    @OneToOne
+    @ManyToOne()
     @JoinColumn(name = "film_id", nullable = false)
     private Film film;
 
@@ -21,12 +21,14 @@ public class Inventory {
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
+    @OneToOne(mappedBy = "inventory")
+    private Rental rental;
 
-    public int getInventoryId() {
+    public Integer getInventoryId() {
         return inventoryId;
     }
 
-    public void setInventoryId(int inventoryId) {
+    public void setInventoryId(Integer inventoryId) {
         this.inventoryId = inventoryId;
     }
 
@@ -34,7 +36,7 @@ public class Inventory {
         return film;
     }
 
-    public void setFilmId(Film film) {
+    public void setFilm(Film film) {
         this.film = film;
     }
 
@@ -54,4 +56,11 @@ public class Inventory {
         this.lastUpdate = lastUpdate;
     }
 
+    public Rental getRental() {
+        return rental;
+    }
+
+    public void setRental(Rental rental) {
+        this.rental = rental;
+    }
 }

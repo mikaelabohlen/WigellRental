@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
+@Table(name = "category")
 public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

@@ -1,9 +1,12 @@
 package org.example.entities;
 
 import javax.persistence.*;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "rental")
 public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -11,7 +14,7 @@ public class Rental {
     private int rentalId;
 
     @Column(name = "rental_date", nullable = false)
-    private Timestamp rentalDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
+    private LocalDateTime rentalDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
 
     @OneToOne
     @JoinColumn(name = "inventory_id", nullable = false)
@@ -39,19 +42,19 @@ public class Rental {
         this.rentalId = rentalId;
     }
 
-    public Timestamp getRentalDate() {
+    public LocalDateTime getRentalDate() {
         return rentalDate;
     }
 
-    public void setRentalDate(Timestamp rentalDate) {
+    public void setRentalDate(LocalDateTime rentalDate) {
         this.rentalDate = rentalDate;
     }
 
-    public Inventory getInventoryId() {
+    public Inventory getInventory() {
         return inventory;
     }
 
-    public void setInventoryId(Inventory inventory) {
+    public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
 
@@ -59,7 +62,7 @@ public class Rental {
         return customer;
     }
 
-    public void setCustomerId(Customer customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
@@ -75,7 +78,7 @@ public class Rental {
         return staff;
     }
 
-    public void setStaffId(Staff staff) {
+    public void setStaff(Staff staff) {
         this.staff = staff;
     }
 
@@ -87,4 +90,12 @@ public class Rental {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        if(this.returnDate == null){
+            return "RentalId=" + rentalId + " rented: " + rentalDate;
+        }else{
+            return "RentalId=" + rentalId + " rented: " + rentalDate + ", returned: "+returnDate;
+        }
+    }
 }

@@ -3,10 +3,13 @@ package org.example.entities;
 import com.vividsolutions.jts.geom.Geometry;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+
 @Entity
-public class Address {
+@Table(name = "address")
+public class Address implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
@@ -17,15 +20,18 @@ public class Address {
     private String address2;
     @Column(length = 20, nullable = false)
     private String district;
-    @OneToOne
+//    @OneToOne//
+    @ManyToOne // Tomas hade denna istället för OneToOne
     @JoinColumn(name = "city_id", nullable = false) // men om fk är nullable överflödig?
     private City city;
     @Column(name = "postal_code", length = 10, columnDefinition = "default NULL")
     private String postalCode;
     @Column(length = 20)
     private String phone;
+
     @Column(nullable = false)
-    private Geometry location; // blir detta rätt? Dependency tillagt i pom-filen
+    private Geometry location;
+
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
@@ -87,6 +93,7 @@ public class Address {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
 
     public Geometry getLocation() {
         return location;
