@@ -29,13 +29,17 @@ class FilmTest {
     @Test
     void getRentals(){
         FilmDAO filmDAO = new FilmDAO();
-        Film film = filmDAO.read(525);
+        Film film = filmDAO.read(698);
 
         List<Inventory> inventories = new ArrayList<>(film.getInventories());
 
-        for(int i = 0; i<inventories.size(); i++){
-            System.out.println(inventories.get(i).getRental());
+        for (Inventory inventory : inventories) {
+            System.out.println(inventory.getRental());
         }
+
+        System.out.println(film.getTotalStock(1));
+        System.out.println(film.getInStock(1));
+
 
 
 
