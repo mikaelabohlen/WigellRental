@@ -13,6 +13,7 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import org.example.Controller;
 import org.example.dao.CategoryDAO;
 import org.example.dao.LanguageDAO;
@@ -64,23 +65,23 @@ public class MoviesGui {
         this.controller = controller;
     }
     public void setupMovies() {
-        titleLabel = new Label("Title:");
-        descriptionLabel = new Label("Description:");
-        releaseYearLabel = new Label("Release Year:");
-        lengthLabel = new Label("Length:");
-        categoryLabel = new Label("Category:");
-        specialFeaturesLabel = new Label("Special Features:");
-        actorsLabel = new Label("Actors:");
-        ratingLabel = new Label("Rating:");
-        languageLabel = new Label("Language:");
-        actorFirstNameLabel = new Label("First name:");
-        actorLastNameLabel = new Label("Last name:");
+        titleLabel = new Label("Titel:");
+        descriptionLabel = new Label("Beskriving:");
+        releaseYearLabel = new Label("Utgivningsår:");
+        lengthLabel = new Label("Längd:");
+        categoryLabel = new Label("Kategori:");
+        specialFeaturesLabel = new Label("Specialfunktioner:");
+        actorsLabel = new Label("Skådespelare:");
+        ratingLabel = new Label("Åldersgräns:");
+        languageLabel = new Label("Språk:");
+        actorFirstNameLabel = new Label("Förnamn:");
+        actorLastNameLabel = new Label("Efternamn:");
 
-        addMovieButton = new Button("Add Movie");
-        updateMovieButton = new Button("Update Movie");
-        deleteMovieButton = new Button("Delete Movie");
-        createMovieButton = new Button("Create new Movie");
-        addActorButton = new Button("Add Actor");
+        addMovieButton = new Button("Lägg till film");
+        updateMovieButton = new Button("Uppdatera film");
+        deleteMovieButton = new Button("Radera film");
+        createMovieButton = new Button("Skapa ny film");
+        addActorButton = new Button("Lägg till skådespelare");
         listByActorButton = new Button("Sök Skådespelare");
 
         titleTextField = new TextField();
@@ -135,11 +136,11 @@ public class MoviesGui {
             languageChoiceBox.getItems().add(language.getName());
         }
 
-        categoryChoiceBox.getItems().add("All Categories");
+        categoryChoiceBox.getItems().add("Alla kategorier");
         for (Category category : categoryList) {
             categoryChoiceBox.getItems().add(category.getName());
         }
-        categoryChoiceBox.setValue("All Categories");
+        categoryChoiceBox.setValue("Alla kategorier");
 
         for (Category category : categoryList) {
             categoryChoiceBox2.getItems().add(category.getName());
@@ -152,6 +153,20 @@ public class MoviesGui {
         ratingChoiceBox.getItems().add(Rating.NC17);
         ratingChoiceBox.getItems().add(Rating.R);
         ratingChoiceBox.setValue(Rating.ALL);
+        ratingChoiceBox.setConverter(new StringConverter<Rating>() {
+            @Override
+            public String toString(Rating rating) {
+                if (rating == Rating.ALL) {
+                    return "Alla åldersgränser";
+                } else {
+                    return rating.toString();
+                }
+            }
+            @Override
+            public Rating fromString(String string) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
 
         ratingChoiceBox2.getItems().add(Rating.G);
         ratingChoiceBox2.getItems().add(Rating.PG);
@@ -227,20 +242,20 @@ public class MoviesGui {
     private void setupFilmTable() {
         filmTable = new TableView<Film>();
 
-        titleColumn = new TableColumn<Film, String>("Title:");
+        titleColumn = new TableColumn<Film, String>("Titel:");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-        releaseYearColumn = new TableColumn<Film, Integer>("Release Year:");
+        releaseYearColumn = new TableColumn<Film, Integer>("Utgivningsår:");
         releaseYearColumn.setCellValueFactory(new PropertyValueFactory<>("releaseYear"));
 
-        lengthColumn = new TableColumn<Film, Integer>("Length:");
+        lengthColumn = new TableColumn<Film, Integer>("Längd:");
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
         lengthColumn.setCellFactory(column-> formatTimeInTableViewCell());
 
-        ratingColumn = new TableColumn<Film, Rating>("Rating:");
+        ratingColumn = new TableColumn<Film, Rating>("Åldersgräns:");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
 
-        categoryColumn = new TableColumn<Film, String>("Category:");
+        categoryColumn = new TableColumn<Film, String>("Kategori:");
         categoryColumn.setCellValueFactory(cellData -> {
             Category category = cellData.getValue().getCategory();
             String categoryName = (category == null) ? "" : category.getName();
@@ -395,14 +410,14 @@ public class MoviesGui {
 
     private void filterFilmTableTitleCategoryRating() {
         FilteredList<Film> filteredList = new FilteredList<>(filmObservableList, p -> true);
-        searchTextFieldTitle.setPromptText("Search by title...");
+        searchTextFieldTitle.setPromptText("Sök efter titel...");
         searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
             String searchTitle = searchTextFieldTitle.getText().toLowerCase();
             String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
             Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
+                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
                 return titleMatch && categoryMatch && ratingMatch;
             });
@@ -414,7 +429,7 @@ public class MoviesGui {
             Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
+                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
                 return titleMatch && categoryMatch && ratingMatch;
             });
@@ -426,7 +441,7 @@ public class MoviesGui {
             Rating searchRating = newValue;
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
+                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
                 return titleMatch && categoryMatch && ratingMatch;
             });
