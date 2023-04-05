@@ -58,17 +58,17 @@ public class MainGui {
             headerLabel = new Label("Wigell Rental");
             headerLabel.setStyle("-fx-font-size: 40");
 
-            storeLabel = new Label("Store: ");
+            storeLabel = new Label("Butik: ");
 
-            choseStoreSubmitButton = new Button("Submit");
+            choseStoreSubmitButton = new Button("Välj");
             choseStoreSubmitButton.setFocusTraversable(false);
 
             choseStoreChoiceBox = new ChoiceBox<>();
             choseStoreChoiceBox.setFocusTraversable(false);
 
             stores = choseStoreChoiceBox.getItems();
-            stores.add("Store One");
-            stores.add("Store Two");
+            stores.add("Butik 1");
+            stores.add("Butik 2");
 
             topHBox = new HBox();
             topHBox.setAlignment(Pos.CENTER);
@@ -92,15 +92,15 @@ public class MainGui {
         private ArrayList<Button> navButtons;
 
         public void setupLeft() {
-            moviesButton = new Button("Movies");
+            moviesButton = new Button("Filmer");
             moviesButton.setFocusTraversable(false);
-            rentButton = new Button("Rent");
+            rentButton = new Button("Hyr");
             rentButton.setFocusTraversable(false);
-            returnButton = new Button("Return");
+            returnButton = new Button("Lämna tillbaka");
             returnButton.setFocusTraversable(false);
-            customersButton = new Button("Customers");
+            customersButton = new Button("Kunder");
             customersButton.setFocusTraversable(false);
-            staffButton = new Button("Staff");
+            staffButton = new Button("Personal");
             staffButton.setFocusTraversable(false);
 
             navButtons = new ArrayList<>();
@@ -650,11 +650,11 @@ public class MainGui {
             if (top.choseStoreChoiceBox.getValue() == null) {
                 return;
             }
-            if (top.choseStoreChoiceBox.getValue().equals("Store One")) {
-                top.storeLabel.setText("Store: 'Store One'");
+            if (top.choseStoreChoiceBox.getValue().equals("Butik 1")) {
+                top.storeLabel.setText("Butik: 'Butik 1'");
                 enableNavButtons();
             } else {
-                top.storeLabel.setText("Store: 'Store Two'");
+                top.storeLabel.setText("Butik: 'Butik 2'");
                 enableNavButtons();
             }
         });

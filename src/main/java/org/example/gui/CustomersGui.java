@@ -107,50 +107,50 @@ public class CustomersGui {
     }
 
     private void setupCustomerTable() {
-        idColumn = new TableColumn<Customer, Integer>("Medlems nummer:");
+        idColumn = new TableColumn<Customer, Integer>("Medlemsnummer:");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        firstNameColumn = new TableColumn<Customer, String>("First name:");
+        firstNameColumn = new TableColumn<Customer, String>("Förnamn:");
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        lastNameColumn = new TableColumn<Customer, String>("Last name");
+        lastNameColumn = new TableColumn<Customer, String>("Efternamn");
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        emailColumn = new TableColumn<Customer, String>("E-Mail:");
+        emailColumn = new TableColumn<Customer, String>("E-Post:");
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        addressColumn = new TableColumn<Customer, String>("Address:");
+        addressColumn = new TableColumn<Customer, String>("Adress:");
         addressColumn.setCellValueFactory(cellData -> {
             Address address = cellData.getValue().getAddress();
             String adressName = (address == null) ? "" : (address.getAddress() + " " + address.getAddress2());
             return new SimpleStringProperty(adressName);
         });
 
-        districtColumn = new TableColumn<Customer, String>("District:");
+        districtColumn = new TableColumn<Customer, String>("Distrikt:");
         districtColumn.setCellValueFactory(cellData-> {
             Address address = cellData.getValue().getAddress();
             String districtName = (address == null) ? "" : (address.getDistrict());
             return new SimpleStringProperty(districtName);
         });
 
-        cityColumn = new TableColumn<Customer, String>("City:");
+        cityColumn = new TableColumn<Customer, String>("Stad:");
         cityColumn.setCellValueFactory(cellData-> {
             City city = cellData.getValue().getAddress().city();
             String cityName = (city == null) ? "" : (city.getCity());
             return new SimpleStringProperty(cityName);
         });
 
-        countryColumn = new TableColumn<Customer, String>("Country");
+        countryColumn = new TableColumn<Customer, String>("Land");
         countryColumn.setCellValueFactory(cellData-> {
             Country country = cellData.getValue().getAddress().city().getCountry();
             String countryName = (country == null) ? "" : (country.getCountry());
             return new SimpleStringProperty(countryName);
         });
 
-        postalCodeColumn = new TableColumn<Customer, String>("Postal Code:");
+        postalCodeColumn = new TableColumn<Customer, String>("Postnummer:");
         postalCodeColumn.setCellValueFactory(cellData-> {
             Address adress = cellData.getValue().getAddress();
             String postalCodeName = (adress == null) ? "" : (adress.getPostalCode());
             return new SimpleStringProperty(postalCodeName);
         });
 
-        phoneColumn = new TableColumn<Customer, String>("Phone:");
+        phoneColumn = new TableColumn<Customer, String>("Telefon:");
         phoneColumn.setCellValueFactory(cellData-> {
             Address address = cellData.getValue().getAddress();
             String phoneName = (address == null) ? "" : (address.getPhone());
