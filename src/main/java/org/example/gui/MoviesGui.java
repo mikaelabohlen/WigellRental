@@ -15,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.example.Controller;
 import org.example.dao.CategoryDAO;
-import org.example.dao.FilmDAO;
 import org.example.dao.LanguageDAO;
 import org.example.entities.Actor;
 import org.example.entities.Category;
@@ -23,11 +22,12 @@ import org.example.entities.Film;
 import org.example.entities.Language;
 import org.example.enums.Rating;
 import org.example.utils.TimeUtil;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class MoviesGui {
     private Controller controller;
@@ -37,12 +37,12 @@ public class MoviesGui {
     private Label titleLabel, descriptionLabel, releaseYearLabel, languageLabel, lengthLabel, ratingLabel, categoryLabel, specialFeaturesLabel, actorsLabel;
     private Label actorFirstNameLabel, actorLastNameLabel;
     private TextField titleTextField, releaseYearTextField, lengthTextField, specialFeaturesTextField;
-    private TextField searchTextFieldTitle, searchTextFieldActor;
+    private TextField searchTextFieldTitle;
     private TextField actorFirstNameTextField, actorLastNameTextField;
     private TextArea descriptionTextArea, actorsTextArea;
     private ListView<String> actorsListView;
     private GridPane moviesGridPane;
-    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton;
+    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton, listByActorButton;
     private VBox centerVBox;
     private HBox searchHBox;
     private TableView<Film> filmTable;
@@ -55,10 +55,10 @@ public class MoviesGui {
     private TableColumn<Film, Integer> releaseYearColumn, lengthColumn;
     private TableColumn<Film, Rating> ratingColumn;
     private TableColumn<Film, String> categoryColumn;
-    private TableColumn<Film, List<Actor>> actorsColumn;
     private ObservableList<Film> filmObservableList;
     private ObservableList<Language> languageObservableList;
     private ObservableList<Category> categoryObservableList;
+    private TextInputDialog actorSearchTextInputDialog;
 
     public MoviesGui(Controller controller) {
         this.controller = controller;
@@ -81,6 +81,7 @@ public class MoviesGui {
         deleteMovieButton = new Button("Delete Movie");
         createMovieButton = new Button("Create new Movie");
         addActorButton = new Button("Add Actor");
+        listByActorButton = new Button("Sök Skådespelare");
 
         titleTextField = new TextField();
         releaseYearTextField = new TextField();
@@ -88,8 +89,6 @@ public class MoviesGui {
         specialFeaturesTextField = new TextField();
         searchTextFieldTitle = new TextField();
         searchTextFieldTitle.setFocusTraversable(false);
-        searchTextFieldActor = new TextField();
-        searchTextFieldActor.setFocusTraversable(false);
         actorFirstNameTextField = new TextField();
         actorLastNameTextField = new TextField();
 
@@ -114,6 +113,10 @@ public class MoviesGui {
         ratingChoiceBox = new ChoiceBox<>();
         ratingChoiceBox2 = new ChoiceBox<>();
         languageChoiceBox = new ChoiceBox<>();
+
+        actorSearchTextInputDialog = new TextInputDialog("Sök på skådespelare");
+        actorSearchTextInputDialog.setTitle("Sök skådespelare");
+        actorSearchTextInputDialog.setHeaderText("Ange namnet på den skådespelare du vill söka på");
 
         //filmDAO = new FilmDAO();
 
@@ -194,7 +197,7 @@ public class MoviesGui {
         searchHBox.setAlignment(Pos.CENTER);
         searchHBox.setPadding(new Insets(10, 10, 10, 10));
         searchHBox.setSpacing(10);
-        searchHBox.getChildren().addAll(searchTextFieldTitle, searchTextFieldActor, ratingChoiceBox, categoryChoiceBox);
+        searchHBox.getChildren().addAll(listByActorButton, searchTextFieldTitle,  ratingChoiceBox, categoryChoiceBox);
 
         centerVBox = new VBox();
         centerVBox.setAlignment(Pos.TOP_CENTER);
@@ -214,10 +217,11 @@ public class MoviesGui {
         handleUpdateMovieButton();
         handleDeleteMovieButton();
         handleAddActorButton();
+        handleListByActorButton();
 
         //EVENTS
         handleFilmTable();
-        filterFilmTable();
+        filterFilmTableTitleCategoryRating();
     }
 
     private void setupFilmTable() {
@@ -243,26 +247,11 @@ public class MoviesGui {
             return new SimpleStringProperty(categoryName);
         });
 
-/*        actorsColumn = new TableColumn<Film, List<Actor>>("Actors:");
-        actorsColumn.setCellValueFactory(new PropertyValueFactory<>("actors"));
-        actorsColumn.setCellFactory(column -> new TableCell<Film, List<Actor>>() {
-            @Override
-            protected void updateItem(List<Actor> actors, boolean empty) {
-                super.updateItem(actors, empty);
-                if (empty || actors == null) {
-                    setText("");
-                } else {
-                    setText(actors.stream().map(actor -> actor.getFirstName() + " " + actor.getLastName()).collect(Collectors.joining(", ")));
-                }
-            }
-        });*/
-
         filmTable.getColumns().add(titleColumn);
         filmTable.getColumns().add(releaseYearColumn);
         filmTable.getColumns().add(lengthColumn);
         filmTable.getColumns().add(ratingColumn);
         filmTable.getColumns().add(categoryColumn);
-        //filmTable.getColumns().add(actorsColumn);
         filmTable.getItems().addAll(filmObservableList);
 
         filmTable.setFocusTraversable(false);
@@ -288,9 +277,6 @@ public class MoviesGui {
 
             double defaultRentalRate = 4.99;
             double defaultReplacementCost = 19.99;
-            /*BigDecimal defaultRentalRate = new BigDecimal("4.99");
-            BigDecimal defaultReplacementCost = new BigDecimal("19.99");*/
-
             for(Category category : categoryObservableList) {
                 if(category.getName().equals(categoryString)) {
                     selectedCategory = category;
@@ -320,7 +306,7 @@ public class MoviesGui {
             controller.getFilmDAO().create(film);
 
             updateFilmTable();
-            filterFilmTable();
+            filterFilmTableTitleCategoryRating();
         });
     }
 
@@ -361,16 +347,36 @@ public class MoviesGui {
         });
     }
 
+    private void handleListByActorButton() {
+        listByActorButton.setOnMouseClicked(event -> {
+            filmTable.setItems(filmObservableList);
+            Optional<String> searchInput = actorSearchTextInputDialog.showAndWait();
+            searchInput.ifPresent(name -> {
+                FilteredList<Film> filteredList = new FilteredList<>(filmObservableList, film -> {
+                    boolean actorMatch = false;
+                    for (Actor actor : film.getActors()) {
+                        if (actor.getFirstName().toLowerCase().contains(name.toLowerCase()) || actor.getLastName().toLowerCase().contains(name.toLowerCase()) ) {
+                            actorMatch = true;
+                            break;
+                        }
+                    }
+                    return actorMatch;
+                });
+                filmTable.setItems(filteredList);
+            });
+        });
+    }
+
     private void handleFilmTable() {
         filmTable.setOnMousePressed(event -> {
             Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
-            //List<Actor> actorList = selectedFilm.getActors();
-            List<Actor> actorList = controller.getActors(selectedFilm);
+            selectedFilm.setActors(controller.getActors(selectedFilm));
+            List<Actor> actorList = selectedFilm.getActors();
             if (selectedFilm != null) {
                 String actors = "";
-           /*     for (int i = 0; i < selectedFilm.getActors().size(); i++) {
+                for (int i = 0; i < selectedFilm.getActors().size(); i++) {
                     actors += selectedFilm.getActors().get(i).getFirstName() + " " + selectedFilm.getActors().get(i).getLastName() + "\n";
-                }*/
+                }
                 titleTextField.setText(selectedFilm.getTitle());
                 releaseYearTextField.setText(String.valueOf(selectedFilm.getReleaseYear()));
                 lengthTextField.setText(TimeUtil.formatTimeMinutesToHourMinutes(selectedFilm.getLength()));
@@ -380,78 +386,49 @@ public class MoviesGui {
                 specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
                 descriptionTextArea.setText(selectedFilm.getDescription());
                 actorsListView.getItems().clear();
-               for (Actor actor : actorList) {
+                for (Actor actor : actorList) {
                     actorsListView.getItems().add(actor.getFirstName() + " " + actor.getLastName());
                 }
             }
         });
     }
 
-    private void filterFilmTable() {
+    private void filterFilmTableTitleCategoryRating() {
         FilteredList<Film> filteredList = new FilteredList<>(filmObservableList, p -> true);
         searchTextFieldTitle.setPromptText("Search by title...");
         searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
             String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-/*            String searchActor = searchTextFieldActor.getText().toLowerCase();*/
             String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
             Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-/*                boolean actorMatch = film.getActors().stream().anyMatch(actor ->
-                        (actor.getFirstName() + " " + actor.getLastName()).toLowerCase().startsWith(searchActor)
-                );*/
                 boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch /*&& actorMatch*/ && categoryMatch && ratingMatch;
-            });
-        });
-
-        searchTextFieldActor.setPromptText("Search by actor...");
-        searchTextFieldActor.setOnKeyReleased(keyEvent -> {
-            String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-/*            String searchActor = searchTextFieldActor.getText().toLowerCase();*/
-            String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
-            Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
-            filteredList.setPredicate(film -> {
-                boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-/*                boolean actorMatch = film.getActors().stream().anyMatch(actor ->
-                        (actor.getFirstName() + " " + actor.getLastName()).toLowerCase().startsWith(searchActor)
-                );*/
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
-                boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch /*&& actorMatch*/ && categoryMatch && ratingMatch;
+                return titleMatch && categoryMatch && ratingMatch;
             });
         });
 
         categoryChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-/*            String searchActor = searchTextFieldActor.getText().toLowerCase();*/
             String searchCategory = newValue.toLowerCase();
             Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-/*                boolean actorMatch = film.getActors().stream().anyMatch(actor ->
-                        (actor.getFirstName() + " " + actor.getLastName()).toLowerCase().startsWith(searchActor)
-                );*/
                 boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch /*&& actorMatch*/ && categoryMatch && ratingMatch;
+                return titleMatch && categoryMatch && ratingMatch;
             });
         });
 
         ratingChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-/*            String searchActor = searchTextFieldActor.getText().toLowerCase();*/
             String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
             Rating searchRating = newValue;
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-/*                boolean actorMatch = film.getActors().stream().anyMatch(actor ->
-                        (actor.getFirstName() + " " + actor.getLastName()).toLowerCase().startsWith(searchActor)
-                );*/
                 boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("all categories") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
                 boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch /*&& actorMatch*/ && categoryMatch && ratingMatch;
+                return titleMatch && categoryMatch && ratingMatch;
             });
         });
 
