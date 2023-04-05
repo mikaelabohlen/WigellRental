@@ -365,6 +365,7 @@ public class MoviesGui {
         filmTable.setOnMousePressed(event -> {
             Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
             //List<Actor> actorList = selectedFilm.getActors();
+            List<Actor> actorList = controller.getActors(selectedFilm);
             if (selectedFilm != null) {
                 String actors = "";
            /*     for (int i = 0; i < selectedFilm.getActors().size(); i++) {
@@ -379,9 +380,9 @@ public class MoviesGui {
                 specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
                 descriptionTextArea.setText(selectedFilm.getDescription());
                 actorsListView.getItems().clear();
-               /* for (Actor actor : actorList) {
+               for (Actor actor : actorList) {
                     actorsListView.getItems().add(actor.getFirstName() + " " + actor.getLastName());
-                }*/
+                }
             }
         });
     }

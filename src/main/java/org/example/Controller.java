@@ -225,5 +225,13 @@ public class Controller {
         controller.getActorDAO().update(actor);
         controller.getFilmDAO().update(film);*/
     }
+    public List<Actor> getActors(Film selectedFilm) {
+//        return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
+        List<Actor> actors = actorDAO.getActorsForFilm(selectedFilm.getFilmId());
 
+        for(Actor actor: actors){
+            System.out.println(actor.getFirstName());
+        }
+        return actors;
+    }
 }
