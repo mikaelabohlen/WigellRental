@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -34,10 +31,11 @@ public class CustomersGui {
     private TableColumn<Customer, String> firstNameColumn, lastNameColumn, emailColumn, addressColumn, districtColumn, cityColumn, countryColumn, postalCodeColumn, phoneColumn;
     private TableColumn<Customer, Timestamp> createDateColumn; //TODO behövs denna?
     private Label firstNameLabel, lastNameLabel, emailLabel, address1Label, address2Label, disctrictLabel, cityLabel, countryLabel, postalCodeLabel, phoneLabel;
-    private TextField firstNameTextField, lastNameTextField, emailTextField, address1TextField, address2TextField, districtTextField, cityTextField, postalCodeTextField, phoneTextField;
+    private TextField firstNameTextField, lastNameTextField, emailTextField, address1TextField, address2TextField, districtTextField, cityTextField,countryTextField, postalCodeTextField, phoneTextField;
     private VBox centerVBox;
     private GridPane customerGridPane;
     private ObservableList<Customer> customerObservableList;
+    private Button addCustomerButton, deleteCustomerButton, updateCustomerButton;
 
     public void setupCustomers() {
         firstNameLabel = new Label("Förnamn:");
@@ -58,8 +56,13 @@ public class CustomersGui {
         address2TextField = new TextField();
         districtTextField = new TextField();
         cityTextField = new TextField();
+        countryTextField = new TextField();
         postalCodeTextField = new TextField();
         phoneTextField = new TextField();
+
+        addCustomerButton = new Button("Lägg till kund");
+        deleteCustomerButton = new Button("Ta bort kund");
+        updateCustomerButton = new Button("Uppdatera kund");
 
         customerTable = new TableView<>();
 
@@ -69,10 +72,28 @@ public class CustomersGui {
         customerGridPane.setVgap(10);
 
         customerGridPane.add(firstNameLabel,0,0,1,1);
-        customerGridPane.add(firstNameTextField,0,1,1,1);
-        customerGridPane.add(lastNameLabel, 1, 0,1,1);
-        customerGridPane.add(lastNameTextField, 1,1,1,1);
-
+        customerGridPane.add(firstNameTextField,1,0,1,1);
+        customerGridPane.add(lastNameLabel, 2, 0,1,1);
+        customerGridPane.add(lastNameTextField, 3,0,1,1);
+        customerGridPane.add(emailLabel, 4,0,1,1);
+        customerGridPane.add(emailTextField,5,0,1,1);
+        customerGridPane.add(phoneLabel,6,0,1,1);
+        customerGridPane.add(phoneTextField,7,0,1,1);
+        customerGridPane.add(address2Label,0,1,1,1);
+        customerGridPane.add(address2TextField,1,1,1,1);
+        customerGridPane.add(address1Label,2,1,1,1);
+        customerGridPane.add(address1TextField,3,1,1,1);
+        customerGridPane.add(disctrictLabel,4,1,1,1);
+        customerGridPane.add(districtTextField,5,1,1,1);
+        customerGridPane.add(countryLabel,0,2,1,1);
+        customerGridPane.add(countryTextField,1,2,1,1);
+        customerGridPane.add(postalCodeLabel,2,2,1,1);
+        customerGridPane.add(postalCodeTextField,3,2,1,1);
+        customerGridPane.add(cityLabel,4,2,1,1);
+        customerGridPane.add(cityTextField,5,2,1,1);
+        customerGridPane.add(addCustomerButton,0,3,1,1);
+        customerGridPane.add(deleteCustomerButton,0,4,1,1);
+        customerGridPane.add(updateCustomerButton,0,5,1,1);
         //TODO SDKG F
         customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
 
