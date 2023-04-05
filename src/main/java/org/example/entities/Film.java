@@ -214,13 +214,12 @@ public class Film {
         return totalStock;
 
     }
-
-
-    public Integer getInStock(int storeId) {
+    
+    public Integer getInStock(int storeId){
         int inStock = 0;
         boolean rented;
 
-        for (Inventory inventory : this.getInventories()) {
+        for(Inventory inventory: this.getInventories()){
             rented = inventory.getRental().getReturnDate() == null;
             if (inventory.getStore().getStoreId() == storeId && !rented) {
                 inStock++;

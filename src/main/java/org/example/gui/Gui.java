@@ -16,17 +16,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Controller;
-import org.example.dao.ActorDAO;
 import org.example.dao.CategoryDAO;
 import org.example.dao.FilmDAO;
 import org.example.dao.LanguageDAO;
-import org.example.entities.Actor;
-import org.example.entities.Category;
-import org.example.entities.Film;
-import org.example.entities.Language;
+import org.example.entities.*;
 import org.example.enums.Rating;
 import org.example.utils.TimeUtil;
 
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -44,7 +41,8 @@ public class Gui {
 
     private Top top;
     private Left left;
-    private Center center;
+    private CenterMovies centerMovies;
+    private CenterCustomers centerCustomers;
 
     private FilmDAO filmDAO;
 
@@ -128,15 +126,17 @@ public class Gui {
         }
     }
 
-    private class Center {
+    private class CenterMovies {
         private Label centerLabel;
         private Label titleLabel, descriptionLabel, releaseYearLabel, languageLabel, lengthLabel, ratingLabel, categoryLabel, specialFeaturesLabel, actorsLabel;
+        private Label actorFirstNameLabel, actorLastNameLabel;
         private TextField titleTextField, releaseYearTextField, lengthTextField, specialFeaturesTextField;
         private TextField searchTextFieldTitle, searchTextFieldActor;
+        private TextField actorFirstNameTextField, actorLastNameTextField;
         private TextArea descriptionTextArea, actorsTextArea;
         private ListView<String> actorsListView;
         private GridPane labelsTextFieldsGridPane;
-        private Button addMovieButton, deleteMovieButton, updateMovieButton;
+        private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton;
         private VBox centerVBox;
         private HBox searchHBox;
         private TableView<Film> filmTable;
@@ -165,10 +165,14 @@ public class Gui {
             actorsLabel = new Label("Actors:");
             ratingLabel = new Label("Rating:");
             languageLabel = new Label("Language:");
+            actorFirstNameLabel = new Label("First name:");
+            actorLastNameLabel = new Label("Last name:");
 
             addMovieButton = new Button("Add Movie");
             updateMovieButton = new Button("Update Movie");
             deleteMovieButton = new Button("Delete Movie");
+            createMovieButton = new Button("Create new Movie");
+            addActorButton = new Button("Add Actor");
 
             titleTextField = new TextField();
             releaseYearTextField = new TextField();
@@ -178,6 +182,8 @@ public class Gui {
             searchTextFieldTitle.setFocusTraversable(false);
             searchTextFieldActor = new TextField();
             searchTextFieldActor.setFocusTraversable(false);
+            actorFirstNameTextField = new TextField();
+            actorLastNameTextField = new TextField();
 
             descriptionTextArea = new TextArea();
             descriptionTextArea.setMaxHeight(100);
@@ -242,21 +248,7 @@ public class Gui {
             ratingChoiceBox2.getItems().add(Rating.NC17);
             ratingChoiceBox2.getItems().add(Rating.R);
 
-            filmTable = new TableView<Film>();
-            filmTable.setFocusTraversable(false);
-
             setupFilmTable();
-
-            filmTable.getColumns().add(titleColumn);
-            filmTable.getColumns().add(releaseYearColumn);
-            filmTable.getColumns().add(lengthColumn);
-            filmTable.getColumns().add(ratingColumn);
-            filmTable.getColumns().add(categoryColumn);
-            filmTable.getColumns().add(actorsColumn);
-            filmTable.getItems().addAll(filmObservableList);
-
-            filmTable.setMaxWidth(800);
-            filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
             labelsTextFieldsGridPane = new GridPane();
             labelsTextFieldsGridPane.setAlignment(Pos.CENTER);
@@ -283,6 +275,12 @@ public class Gui {
             labelsTextFieldsGridPane.add(addMovieButton, 0, 3, 1, 1);
             labelsTextFieldsGridPane.add(deleteMovieButton, 0, 4, 1, 1);
             labelsTextFieldsGridPane.add(updateMovieButton, 0, 5, 1, 1);
+            labelsTextFieldsGridPane.add(createMovieButton,0,6,1,1);
+            labelsTextFieldsGridPane.add(actorFirstNameLabel,2,3,1,1);
+            labelsTextFieldsGridPane.add(actorFirstNameTextField,3,3,1,1);
+            labelsTextFieldsGridPane.add(actorLastNameLabel,2,4,1,1);
+            labelsTextFieldsGridPane.add(actorLastNameTextField,3,4,1,1);
+            labelsTextFieldsGridPane.add(addActorButton,3,5,1,1);
 
             searchHBox = new HBox();
             searchHBox.setAlignment(Pos.CENTER);
@@ -294,13 +292,13 @@ public class Gui {
             centerVBox.setAlignment(Pos.TOP_CENTER);
             centerVBox.setPadding(new Insets(10, 10, 10, 10));
             centerVBox.setSpacing(10);
-            center.centerVBox.getChildren().add(centerLabel);
+            centerMovies.centerVBox.getChildren().add(centerLabel);
 
-
-            mainPane.setCenter(centerVBox);
         }
 
         private void setupFilmTable() {
+            filmTable = new TableView<Film>();
+
             titleColumn = new TableColumn<Film, String>("Title:");
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
@@ -334,19 +332,129 @@ public class Gui {
                     }
                 }
             });
+
+            filmTable.getColumns().add(titleColumn);
+            filmTable.getColumns().add(releaseYearColumn);
+            filmTable.getColumns().add(lengthColumn);
+            filmTable.getColumns().add(ratingColumn);
+            filmTable.getColumns().add(categoryColumn);
+            filmTable.getColumns().add(actorsColumn);
+            filmTable.getItems().addAll(filmObservableList);
+
+            filmTable.setFocusTraversable(false);
+            filmTable.setMaxWidth(800);
+            filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }
+    }
+
+    private class CenterCustomers {
+        private TableView<Customer> customerTable;
+        private TableColumn<Customer, String> firstNameColumn;
+        private TableColumn<Customer, String> lastNameColumn;
+        private TableColumn<Customer, String> emailColumn;
+        private TableColumn<Customer, String> addressColumn;
+        private TableColumn<Customer, String> districtColumn;
+        private TableColumn<Customer, String> cityColumn;
+        private TableColumn<Customer, String> countryColumn;
+        private TableColumn<Customer, String> postalCodeColumn;
+        private TableColumn<Customer, String> phoneColumn;
+        private TableColumn<Customer, Timestamp> createDateColumn;
+        private VBox centerVBox;
+        private ObservableList<Customer> customerObservableList;
+        public void setupCenterCustomers() {
+            customerTable = new TableView<>();
+
+            //TODO SDKG F
+            customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
+
+            setupCustomerTable();
+
+            centerVBox = new VBox();
+            centerVBox.setAlignment(Pos.TOP_CENTER);
+            centerVBox.setPadding(new Insets(10, 10, 10, 10));
+            centerVBox.setSpacing(10);
+
+        }
+
+        private void setupCustomerTable() {
+            firstNameColumn = new TableColumn<Customer, String>("First name:");
+            firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+            lastNameColumn = new TableColumn<Customer, String>("Last name");
+            lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+            emailColumn = new TableColumn<Customer, String>("E-Mail:");
+            emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+            addressColumn = new TableColumn<Customer, String>("Address:");
+            addressColumn.setCellValueFactory(cellData -> {
+                Address address = cellData.getValue().getAddress();
+                String adressName = (address == null) ? "" : (address.getAddress() + " " + address.getAddress2());
+                return new SimpleStringProperty(adressName);
+            });
+
+            districtColumn = new TableColumn<Customer, String>("District:");
+            districtColumn.setCellValueFactory(cellData-> {
+                Address address = cellData.getValue().getAddress();
+                String districtName = (address == null) ? "" : (address.getDistrict());
+                return new SimpleStringProperty(districtName);
+            });
+
+            cityColumn = new TableColumn<Customer, String>("City:");
+            cityColumn.setCellValueFactory(cellData-> {
+                City city = cellData.getValue().getAddress().city();
+                String cityName = (city == null) ? "" : (city.getCity());
+                return new SimpleStringProperty(cityName);
+            });
+
+            countryColumn = new TableColumn<Customer, String>("Country");
+            countryColumn.setCellValueFactory(cellData-> {
+                Country country = cellData.getValue().getAddress().city().getCountry();
+                String countryName = (country == null) ? "" : (country.getCountry());
+                return new SimpleStringProperty(countryName);
+            });
+
+            postalCodeColumn = new TableColumn<Customer, String>("Postal Code:");
+            postalCodeColumn.setCellValueFactory(cellData-> {
+                Address adress = cellData.getValue().getAddress();
+                String postalCodeName = (adress == null) ? "" : (adress.getPostalCode());
+                return new SimpleStringProperty(postalCodeName);
+            });
+
+            phoneColumn = new TableColumn<Customer, String>("Phone:");
+            phoneColumn.setCellValueFactory(cellData-> {
+                Address address = cellData.getValue().getAddress();
+                String phoneName = (address == null) ? "" : (address.getPhone());
+                return new SimpleStringProperty(phoneName);
+            });
+
+            customerTable.getColumns().add(firstNameColumn);
+            customerTable.getColumns().add(lastNameColumn);
+            customerTable.getColumns().add(emailColumn);
+            customerTable.getColumns().add(addressColumn);
+            customerTable.getColumns().add(districtColumn);
+            customerTable.getColumns().add(cityColumn);
+            customerTable.getColumns().add(countryColumn);
+            customerTable.getColumns().add(postalCodeColumn);
+            customerTable.getColumns().add(phoneColumn);
+            customerTable.getItems().addAll(customerObservableList);
+
+            customerTable.setFocusTraversable(false);
+            customerTable.setMaxWidth(1200);
+            customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        }
+
     }
     public void launch() {
         top = new Top();
         left = new Left();
-        center = new Center();
+        centerMovies = new CenterMovies();
+        centerCustomers = new CenterCustomers();
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
 
         top.setupTop();
         left.setupLeft();
-        center.setupCenter();
+        centerMovies.setupCenter();
+        centerCustomers.setupCenterCustomers();
 
         disableNavButtons();
         buttonActions();
@@ -375,13 +483,17 @@ public class Gui {
         handleAddMovieButton();
         handleDeleteMovieButton();
         handleUpdateMovieButton();
+        handleAddActorButton();
     }
 
     private void handleCustomerButton() {
         left.customersButton.setOnMouseClicked(event-> {
+            mainPane.setCenter(null);
             enableNavButtons();
             left.customersButton.setDisable(true);
-            center.centerLabel.setText("Customer");
+            centerCustomers.centerVBox.getChildren().clear();
+            centerCustomers.centerVBox.getChildren().addAll(centerCustomers.customerTable);
+            mainPane.setCenter(centerCustomers.centerVBox);
         });
     }
 
@@ -389,7 +501,7 @@ public class Gui {
         left.staffButton.setOnMouseClicked(event-> {
             enableNavButtons();
             left.staffButton.setDisable(true);
-            center.centerLabel.setText("Staff");
+            centerMovies.centerLabel.setText("Staff");
         });
     }
 
@@ -397,7 +509,7 @@ public class Gui {
         left.returnButton.setOnMouseClicked(event-> {
             enableNavButtons();
             left.returnButton.setDisable(true);
-            center.centerLabel.setText("Return");
+            centerMovies.centerLabel.setText("Return");
         });
     }
 
@@ -405,46 +517,50 @@ public class Gui {
         left.rentButton.setOnMouseClicked(event-> {
             enableNavButtons();
             left.rentButton.setDisable(true);
-            center.centerLabel.setText("Rent");
+            centerMovies.centerLabel.setText("Rent");
         });
     }
 
     private void handleMoviesButton() {
         left.moviesButton.setOnMouseClicked(event-> {
+            mainPane.setCenter(null);
             enableNavButtons();
             left.moviesButton.setDisable(true);
-            center.centerVBox.getChildren().clear();
-            center.centerVBox.getChildren().addAll(center.searchHBox,center.filmTable, center.labelsTextFieldsGridPane);
+            centerMovies.centerVBox.getChildren().clear();
+            centerMovies.centerVBox.getChildren().addAll(centerMovies.searchHBox, centerMovies.filmTable, centerMovies.labelsTextFieldsGridPane);
+            mainPane.setCenter(centerMovies.centerVBox);
         });
     }
 
     private void handleAddMovieButton() {
         //TODO KAN DENNA LÖSAS SNYGGARE/BÄTTRE????? ANTAGLIGEN MEN HUR
-        center.addMovieButton.setOnMouseClicked(event-> {
-            String selectedTitle = center.titleTextField.getText();
-            String selectedDescription = center.descriptionTextArea.getText();
-            int selectedReleaseYear = Integer.parseInt(center.releaseYearTextField.getText());
-            String languageChoiceBox = center.languageChoiceBox.getValue();
-            String categoryChoiceBox = center.categoryChoiceBox2.getValue();
+        centerMovies.addMovieButton.setOnMouseClicked(event-> {
+            String selectedTitle = centerMovies.titleTextField.getText();
+            String selectedDescription = centerMovies.descriptionTextArea.getText();
+            int selectedReleaseYear = Integer.parseInt(centerMovies.releaseYearTextField.getText());
+            String languageChoiceBox = centerMovies.languageChoiceBox.getValue();
+            String categoryChoiceBox = centerMovies.categoryChoiceBox2.getValue();
 
             Category selectedCategory = null;
             Language selectedLanguage = null;
-            Rating selectedRating = center.ratingChoiceBox2.getValue();
-            System.out.println(center.ratingChoiceBox2.getValue().getRating());
+            Rating selectedRating = centerMovies.ratingChoiceBox2.getValue();
+            System.out.println(centerMovies.ratingChoiceBox2.getValue().getRating());
+
+            System.out.println(centerMovies.actorsListView.getItems());
 
             double defaultRentalRate = 4.99;
             double defaultReplacementCost = 19.99;
             /*BigDecimal defaultRentalRate = new BigDecimal("4.99");
             BigDecimal defaultReplacementCost = new BigDecimal("19.99");*/
 
-            for(Category category : center.categoryObservableList) {
+            for(Category category : centerMovies.categoryObservableList) {
                 if(category.getName().equals(categoryChoiceBox)) {
                     selectedCategory = category;
                     break;
                 }
             }
 
-            for(Language language : center.languageObservableList) {
+            for(Language language : centerMovies.languageObservableList) {
                 if(language.getName().equals(languageChoiceBox)) {
                     selectedLanguage = language;
                     break;
@@ -465,21 +581,45 @@ public class Gui {
             //TODO HURFAN FÅR MAN TILL MED SETACTORS?
             filmDAO.create(film);
 
-
             updateFilmTable();
             filterTable();
         });
     }
 
     private void handleUpdateMovieButton() {
-        center.updateMovieButton.setOnMouseClicked(event-> {
+        centerMovies.updateMovieButton.setOnMouseClicked(event-> {
             //TODO Fixa detta
         });
     }
 
     private void handleDeleteMovieButton() {
-        center.deleteMovieButton.setOnMouseClicked(event-> {
+        centerMovies.deleteMovieButton.setOnMouseClicked(event-> {
             //TODO fixa detta
+        });
+    }
+
+    private void handleAddActorButton() {
+        centerMovies.addActorButton.setOnMouseClicked(event -> {
+            Actor actor = new Actor();
+            String firstName = centerMovies.actorFirstNameTextField.getText().toUpperCase();
+            String lastName = centerMovies.actorLastNameTextField.getText().toUpperCase();
+            String fullName = firstName + " " + lastName;
+            actor.setFirstName(firstName);
+            actor.setLastName(lastName);
+
+            if (!firstName.isEmpty() && !lastName.isEmpty()) {
+                boolean actorAlreadyExists = false;
+                for (String actorName : centerMovies.actorsListView.getItems()) {
+                    if (actorName.equals(fullName)) {
+                        actorAlreadyExists = true;
+                        break;
+                    }
+                }
+                if (!actorAlreadyExists) {
+                    centerMovies.actorsListView.getItems().add(fullName);
+                }
+                //TODO hantera actor objet i kontrollern spara
+            }
         });
     }
 
@@ -517,38 +657,38 @@ public class Gui {
     }
 
     private void handleFilmTable() {
-        center.filmTable.setOnMousePressed(event -> {
-            Film selectedFilm = center.filmTable.getSelectionModel().getSelectedItem();
+        centerMovies.filmTable.setOnMousePressed(event -> {
+            Film selectedFilm = centerMovies.filmTable.getSelectionModel().getSelectedItem();
             List<Actor> actorList = selectedFilm.getActors();
             if (selectedFilm != null) {
                 String actors="";
                 for(int i=0; i<selectedFilm.getActors().size(); i++) {
                     actors += selectedFilm.getActors().get(i).getFirstName() + " " + selectedFilm.getActors().get(i).getLastName() + "\n";
                 }
-                center.titleTextField.setText(selectedFilm.getTitle());
-                center.releaseYearTextField.setText(String.valueOf(selectedFilm.getReleaseYear()));
-                center.lengthTextField.setText(TimeUtil.formatTimeMinutesToHourMinutes(selectedFilm.getLength()));
-                center.categoryChoiceBox2.setValue(selectedFilm.getCategory().getName());
-                center.ratingChoiceBox2.setValue(selectedFilm.getRating());
-                center.languageChoiceBox.setValue(selectedFilm.getLanguage().getName());
-                center.specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
-                center.descriptionTextArea.setText(selectedFilm.getDescription());
-                center.actorsListView.getItems().clear();
+                centerMovies.titleTextField.setText(selectedFilm.getTitle());
+                centerMovies.releaseYearTextField.setText(String.valueOf(selectedFilm.getReleaseYear()));
+                centerMovies.lengthTextField.setText(TimeUtil.formatTimeMinutesToHourMinutes(selectedFilm.getLength()));
+                centerMovies.categoryChoiceBox2.setValue(selectedFilm.getCategory().getName());
+                centerMovies.ratingChoiceBox2.setValue(selectedFilm.getRating());
+                centerMovies.languageChoiceBox.setValue(selectedFilm.getLanguage().getName());
+                centerMovies.specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
+                centerMovies.descriptionTextArea.setText(selectedFilm.getDescription());
+                centerMovies.actorsListView.getItems().clear();
                 for (Actor actor : actorList) {
-                    center.actorsListView.getItems().add(actor.getFirstName() + " " + actor.getLastName());
+                    centerMovies.actorsListView.getItems().add(actor.getFirstName() + " " + actor.getLastName());
                 }
             }
         });
     }
 
     private void filterTable() {
-        FilteredList<Film> filteredList = new FilteredList<>(center.filmObservableList, p -> true);
-        center.searchTextFieldTitle.setPromptText("Search by title...");
-        center.searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
-            String searchTitle = center.searchTextFieldTitle.getText().toLowerCase();
-            String searchActor = center.searchTextFieldActor.getText().toLowerCase();
-            String searchCategory = center.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
-            Rating searchRating = center.ratingChoiceBox.getSelectionModel().getSelectedItem();
+        FilteredList<Film> filteredList = new FilteredList<>(centerMovies.filmObservableList, p -> true);
+        centerMovies.searchTextFieldTitle.setPromptText("Search by title...");
+        centerMovies.searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
+            String searchTitle = centerMovies.searchTextFieldTitle.getText().toLowerCase();
+            String searchActor = centerMovies.searchTextFieldActor.getText().toLowerCase();
+            String searchCategory = centerMovies.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
+            Rating searchRating = centerMovies.ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
                 boolean actorMatch = film.getActors().stream().anyMatch(actor ->
@@ -560,12 +700,12 @@ public class Gui {
             });
         });
 
-        center.searchTextFieldActor.setPromptText("Search by actor...");
-        center.searchTextFieldActor.setOnKeyReleased(keyEvent -> {
-            String searchTitle = center.searchTextFieldTitle.getText().toLowerCase();
-            String searchActor = center.searchTextFieldActor.getText().toLowerCase();
-            String searchCategory = center.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
-            Rating searchRating = center.ratingChoiceBox.getSelectionModel().getSelectedItem();
+        centerMovies.searchTextFieldActor.setPromptText("Search by actor...");
+        centerMovies.searchTextFieldActor.setOnKeyReleased(keyEvent -> {
+            String searchTitle = centerMovies.searchTextFieldTitle.getText().toLowerCase();
+            String searchActor = centerMovies.searchTextFieldActor.getText().toLowerCase();
+            String searchCategory = centerMovies.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
+            Rating searchRating = centerMovies.ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
                 boolean actorMatch = film.getActors().stream().anyMatch(actor ->
@@ -577,11 +717,11 @@ public class Gui {
             });
         });
 
-        center.categoryChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String searchTitle = center.searchTextFieldTitle.getText().toLowerCase();
-            String searchActor = center.searchTextFieldActor.getText().toLowerCase();
+        centerMovies.categoryChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            String searchTitle = centerMovies.searchTextFieldTitle.getText().toLowerCase();
+            String searchActor = centerMovies.searchTextFieldActor.getText().toLowerCase();
             String searchCategory = newValue.toLowerCase();
-            Rating searchRating = center.ratingChoiceBox.getSelectionModel().getSelectedItem();
+            Rating searchRating = centerMovies.ratingChoiceBox.getSelectionModel().getSelectedItem();
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
                 boolean actorMatch = film.getActors().stream().anyMatch(actor ->
@@ -593,10 +733,10 @@ public class Gui {
             });
         });
 
-        center.ratingChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String searchTitle = center.searchTextFieldTitle.getText().toLowerCase();
-            String searchActor = center.searchTextFieldActor.getText().toLowerCase();
-            String searchCategory = center.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
+        centerMovies.ratingChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            String searchTitle = centerMovies.searchTextFieldTitle.getText().toLowerCase();
+            String searchActor = centerMovies.searchTextFieldActor.getText().toLowerCase();
+            String searchCategory = centerMovies.categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
             Rating searchRating = newValue;
             filteredList.setPredicate(film -> {
                 boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
@@ -609,12 +749,12 @@ public class Gui {
             });
         });
 
-        center.filmTable.setItems(filteredList);
+        centerMovies.filmTable.setItems(filteredList);
     }
 
     private void updateFilmTable() {
-        center.filmObservableList = FXCollections.observableList(filmDAO.getAll());
-        center.filmTable.setItems(center.filmObservableList);
+        centerMovies.filmObservableList = FXCollections.observableList(filmDAO.getAll());
+        centerMovies.filmTable.setItems(centerMovies.filmObservableList);
     }
 
     private TableCell<Film, Integer> formatTimeInTableViewCell() {
