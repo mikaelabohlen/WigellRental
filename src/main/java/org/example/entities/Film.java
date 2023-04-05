@@ -214,12 +214,10 @@ public class Film {
         return totalStock;
 
     }
+
     public Integer getInStock(int storeId){
         int inStock = 0;
         boolean rented;
-
-    public void setCategory(Category category) {
-        this.category = category;
 
         for(Inventory inventory: this.getInventories()){
             rented = inventory.getRental().getReturnDate() == null;
