@@ -1,10 +1,13 @@
 package org.example;
 
 import org.example.dao.*;
+import org.example.entities.Actor;
 import org.example.entities.Film;
 import org.example.entities.Inventory;
 import org.example.entities.Rental;
+import org.example.enums.Rating;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,18 +20,20 @@ public class Controller {
     private CustomerDAO customerDAO;
     private FilmDAO filmDAO;
     private InventoryDAO inventoryDAO;
+    private LanguageDAO languageDAO;
     private PaymentDAO paymentDAO;
     private RentalDAO rentalDAO;
     private StaffDAO staffDAO;
     private StoreDAO storeDAO;
 
-    public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
+    public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, LanguageDAO languageDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
         this.actorDAO = actorDAO;
         this.addressDAO = addressDAO;
         this.cityDAO = cityDAO;
         this.customerDAO = customerDAO;
         this.filmDAO = filmDAO;
         this.inventoryDAO = inventoryDAO;
+        this.languageDAO = languageDAO;
         this.paymentDAO = paymentDAO;
         this.rentalDAO = rentalDAO;
         this.staffDAO = staffDAO;
@@ -81,6 +86,14 @@ public class Controller {
 
     public void setInventoryDAO(InventoryDAO inventoryDAO) {
         this.inventoryDAO = inventoryDAO;
+    }
+
+    public LanguageDAO getLanguageDAO() {
+        return languageDAO;
+    }
+
+    public void setLanguageDAO(LanguageDAO languageDAO) {
+        this.languageDAO = languageDAO;
     }
 
     public PaymentDAO getPaymentDAO() {
@@ -143,6 +156,62 @@ public class Controller {
 
         }
     }
+    public void createNewFilm (Film film) {
+/*        Film film = new Film();
+        film.setTitle("Solen");
+        film.setDescription("Bla bla bla...");
+        film.setReleaseYear(2012);
+        film.setLanguage(languageDAO.read(1));
+        film.setOriginalLanguage(languageDAO.read(1));
+        film.setRentalDuration(3);
+        film.setRentalRate(new BigDecimal(3.44));
+        film.setLength(34);
+        film.setReplacementCost(new BigDecimal(3.44));
+        film.setRating(Rating.NC17);
+        film.setSpecialFeatures("Trailers");
+        film.setLastUpdate(new Timestamp(System.currentTimeMillis()));*/
 
+        filmDAO.create(film);
+    }
+
+    void connectionActorFilm(Film film, List<Actor> actorList) {
+/*        Film film = filmDAO.read(1004);
+        film.setRentalDuration(3);
+        film.setRentalRate(new BigDecimal(4.99));
+        filmDAO.update(film);*/
+
+/*        Store store = controller.getStoreDAO().read(1);
+        Inventory inventory = new Inventory();
+        inventory.setFilm(film);
+        inventory.setStore(store);
+        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        controller.getInventoryDAO().create(inventory);*/
+
+        Actor actor1 = actorDAO.read(1);
+        Actor actor2 = actorDAO.read(5);
+        Actor actor3 = actorDAO.read(3);
+
+        actor1.addOneMovie(film);
+        actor2.addOneMovie(film);
+        actor3.addOneMovie(film);
+
+        actorDAO.update(actor1);
+        actorDAO.update(actor2);
+        actorDAO.update(actor3);
+        /*List<Actor> actorList = new ArrayList<>();
+        actorList.add(actor1);
+        actorList.add(actor2);
+        actorList.add(actor3);
+        film.setActors(actorList);
+        controller.getFilmDAO().update(film);*/
+
+
+
+/*        Film film = controller.getFilmDAO().read(1);
+        Actor actor = controller.getActorDAO().read(2);
+        actor.addOneMovie(film);
+        controller.getActorDAO().update(actor);
+        controller.getFilmDAO().update(film);*/
+    }
 
 }

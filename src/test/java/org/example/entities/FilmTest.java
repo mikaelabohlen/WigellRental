@@ -3,6 +3,7 @@ package org.example.entities;
 import com.vividsolutions.jts.util.Assert;
 import org.example.dao.FilmDAO;
 import org.example.dao.InventoryDAO;
+import org.example.dao.LanguageDAO;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -42,10 +43,19 @@ class FilmTest {
 
 
 
-
 //        while(interator.hasNext()){
 //            System.out.println(interator.get);
 //        }
 //        Assert.equals(film.getInventories().getRental());
     }
+
+/*    @Test
+    void createNewFilm () {
+        LanguageDAO languageDAO = new LanguageDAO();
+        Film film = new Film();
+        film.setTitle("Solen");
+        film.setDescription("Bla bla bla...");
+        film.setReleaseYear(2012);
+        film.setLanguage(languageDAO.read);
+    }*/
 }

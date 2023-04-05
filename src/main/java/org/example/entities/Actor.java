@@ -18,7 +18,7 @@ public class Actor {
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
     @JoinTable(name = "film_actor",
             joinColumns = {@JoinColumn(name = "actor_id")},
             inverseJoinColumns = {@JoinColumn(name = "film_id")})
@@ -65,5 +65,9 @@ public class Actor {
 
     public void setFilms(List<Film> films) {
         this.films = films;
+    }
+
+    public void addOneMovie(Film film) {
+        films.add(film);
     }
 }
