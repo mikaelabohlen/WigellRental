@@ -71,7 +71,7 @@ public class Film {
 
 //    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
 //    private List<Inventory> inventories;
-    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)//TODO ändra till eager?
     private Set<Inventory> inventories;
 
 
@@ -214,17 +214,18 @@ public class Film {
         return totalStock;
 
     }
-
+    
     public Integer getInStock(int storeId){
         int inStock = 0;
         boolean rented;
 
         for(Inventory inventory: this.getInventories()){
             rented = inventory.getRental().getReturnDate() == null;
-            if(inventory.getStore().getStoreId() == storeId && !rented){
-                inStock ++;
+            if (inventory.getStore().getStoreId() == storeId && !rented) {
+                inStock++;
             }
         }
         return inStock;
     }
 }
+
