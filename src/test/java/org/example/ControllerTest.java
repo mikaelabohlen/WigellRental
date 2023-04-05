@@ -13,7 +13,7 @@ class ControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new Controller(new ActorDAO(), new AddressDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
+        controller = new Controller(new ActorDAO(), new AddressDAO(), new CategoryDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
 
     }
 

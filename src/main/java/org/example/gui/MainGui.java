@@ -1,6 +1,5 @@
 package org.example.gui;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -8,29 +7,22 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Controller;
-import org.example.dao.CategoryDAO;
 import org.example.dao.FilmDAO;
-import org.example.dao.LanguageDAO;
 import org.example.entities.*;
 import org.example.enums.Rating;
 import org.example.utils.TimeUtil;
 
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class Gui {
+public class MainGui {
 
     private Controller controller;
 
@@ -41,12 +33,13 @@ public class Gui {
 
     private Top top;
     private Left left;
-    private CenterMovies centerMovies;
-    private CenterCustomers centerCustomers;
+    /* private CenterMovies centerMovies;*/
+    private CustomersGui customersGui;
+    private MoviesGui moviesGui;
 
     private FilmDAO filmDAO;
 
-    public Gui(Stage primaryStage, Controller controller) {
+    public MainGui(Stage primaryStage, Controller controller) {
         this.primaryStage = primaryStage;
         this.controller = controller;
     }
@@ -80,13 +73,13 @@ public class Gui {
             topHBox = new HBox();
             topHBox.setAlignment(Pos.CENTER);
             topHBox.setSpacing(10);
-            topHBox.setPadding(new Insets(10,10,10,10));
+            topHBox.setPadding(new Insets(10, 10, 10, 10));
             topHBox.getChildren().addAll(choseStoreChoiceBox, choseStoreSubmitButton);
 
             topVBox = new VBox();
             topVBox.setAlignment(Pos.CENTER);
             topVBox.setPadding(new Insets(10, 10, 10, 10));
-            topVBox.getChildren().addAll(headerLabel,storeLabel, topHBox);
+            topVBox.getChildren().addAll(headerLabel, storeLabel, topHBox);
 
             mainPane.setTop(topVBox);
 
@@ -97,6 +90,7 @@ public class Gui {
         private Button moviesButton, rentButton, returnButton, customersButton, staffButton;
         private VBox buttonVBox;
         private ArrayList<Button> navButtons;
+
         public void setupLeft() {
             moviesButton = new Button("Movies");
             moviesButton.setFocusTraversable(false);
@@ -119,14 +113,14 @@ public class Gui {
             buttonVBox = new VBox();
             buttonVBox.setAlignment(Pos.TOP_LEFT);
             buttonVBox.setSpacing(20);
-            buttonVBox.setPadding(new Insets(50,10,10,20));
+            buttonVBox.setPadding(new Insets(50, 10, 10, 20));
             buttonVBox.getChildren().addAll(navButtons);
 
             mainPane.setLeft(buttonVBox);
         }
     }
 
-    private class CenterMovies {
+/*    private class CenterMovies {
         private Label centerLabel;
         private Label titleLabel, descriptionLabel, releaseYearLabel, languageLabel, lengthLabel, ratingLabel, categoryLabel, specialFeaturesLabel, actorsLabel;
         private Label actorFirstNameLabel, actorLastNameLabel;
@@ -135,7 +129,7 @@ public class Gui {
         private TextField actorFirstNameTextField, actorLastNameTextField;
         private TextArea descriptionTextArea, actorsTextArea;
         private ListView<String> actorsListView;
-        private GridPane labelsTextFieldsGridPane;
+        private GridPane moviesGridPane;
         private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton;
         private VBox centerVBox;
         private HBox searchHBox;
@@ -250,37 +244,37 @@ public class Gui {
 
             setupFilmTable();
 
-            labelsTextFieldsGridPane = new GridPane();
-            labelsTextFieldsGridPane.setAlignment(Pos.CENTER);
-            labelsTextFieldsGridPane.setHgap(10);
-            labelsTextFieldsGridPane.setVgap(10);
-            labelsTextFieldsGridPane.add(titleLabel, 0, 0, 1, 1);
-            labelsTextFieldsGridPane.add(titleTextField, 1, 0, 1, 1);
-            labelsTextFieldsGridPane.add(releaseYearLabel, 2, 0, 1, 1);
-            labelsTextFieldsGridPane.add(releaseYearTextField, 3, 0, 1, 1);
-            labelsTextFieldsGridPane.add(lengthLabel, 4, 0, 1, 1);
-            labelsTextFieldsGridPane.add(lengthTextField, 5, 0, 1, 1);
-            labelsTextFieldsGridPane.add(categoryLabel, 6, 0, 1, 1);
-            labelsTextFieldsGridPane.add(categoryChoiceBox2, 7, 0, 1, 1);
-            labelsTextFieldsGridPane.add(languageLabel, 4, 1, 1, 1);
-            labelsTextFieldsGridPane.add(languageChoiceBox, 5, 1, 1, 1);
-            labelsTextFieldsGridPane.add(ratingLabel, 6, 1, 1, 1);
-            labelsTextFieldsGridPane.add(ratingChoiceBox2, 7, 1, 1, 1);
-            labelsTextFieldsGridPane.add(specialFeaturesLabel, 0, 1, 1, 1);
-            labelsTextFieldsGridPane.add(specialFeaturesTextField, 1, 1, 2, 1);
-            labelsTextFieldsGridPane.add(descriptionLabel, 0, 2, 1, 1);
-            labelsTextFieldsGridPane.add(descriptionTextArea, 1, 2, 1, 1);
-            labelsTextFieldsGridPane.add(actorsLabel, 2, 2, 1, 1);
-            labelsTextFieldsGridPane.add(actorsListView, 3, 2, 1, 1);
-            labelsTextFieldsGridPane.add(addMovieButton, 0, 3, 1, 1);
-            labelsTextFieldsGridPane.add(deleteMovieButton, 0, 4, 1, 1);
-            labelsTextFieldsGridPane.add(updateMovieButton, 0, 5, 1, 1);
-            labelsTextFieldsGridPane.add(createMovieButton,0,6,1,1);
-            labelsTextFieldsGridPane.add(actorFirstNameLabel,2,3,1,1);
-            labelsTextFieldsGridPane.add(actorFirstNameTextField,3,3,1,1);
-            labelsTextFieldsGridPane.add(actorLastNameLabel,2,4,1,1);
-            labelsTextFieldsGridPane.add(actorLastNameTextField,3,4,1,1);
-            labelsTextFieldsGridPane.add(addActorButton,3,5,1,1);
+            moviesGridPane = new GridPane();
+            moviesGridPane.setAlignment(Pos.CENTER);
+            moviesGridPane.setHgap(10);
+            moviesGridPane.setVgap(10);
+            moviesGridPane.add(titleLabel, 0, 0, 1, 1);
+            moviesGridPane.add(titleTextField, 1, 0, 1, 1);
+            moviesGridPane.add(releaseYearLabel, 2, 0, 1, 1);
+            moviesGridPane.add(releaseYearTextField, 3, 0, 1, 1);
+            moviesGridPane.add(lengthLabel, 4, 0, 1, 1);
+            moviesGridPane.add(lengthTextField, 5, 0, 1, 1);
+            moviesGridPane.add(categoryLabel, 6, 0, 1, 1);
+            moviesGridPane.add(categoryChoiceBox2, 7, 0, 1, 1);
+            moviesGridPane.add(languageLabel, 4, 1, 1, 1);
+            moviesGridPane.add(languageChoiceBox, 5, 1, 1, 1);
+            moviesGridPane.add(ratingLabel, 6, 1, 1, 1);
+            moviesGridPane.add(ratingChoiceBox2, 7, 1, 1, 1);
+            moviesGridPane.add(specialFeaturesLabel, 0, 1, 1, 1);
+            moviesGridPane.add(specialFeaturesTextField, 1, 1, 2, 1);
+            moviesGridPane.add(descriptionLabel, 0, 2, 1, 1);
+            moviesGridPane.add(descriptionTextArea, 1, 2, 1, 1);
+            moviesGridPane.add(actorsLabel, 2, 2, 1, 1);
+            moviesGridPane.add(actorsListView, 3, 2, 1, 1);
+            moviesGridPane.add(addMovieButton, 0, 3, 1, 1);
+            moviesGridPane.add(deleteMovieButton, 0, 4, 1, 1);
+            moviesGridPane.add(updateMovieButton, 0, 5, 1, 1);
+            moviesGridPane.add(createMovieButton,0,6,1,1);
+            moviesGridPane.add(actorFirstNameLabel,2,3,1,1);
+            moviesGridPane.add(actorFirstNameTextField,3,3,1,1);
+            moviesGridPane.add(actorLastNameLabel,2,4,1,1);
+            moviesGridPane.add(actorLastNameTextField,3,4,1,1);
+            moviesGridPane.add(addActorButton,3,5,1,1);
 
             searchHBox = new HBox();
             searchHBox.setAlignment(Pos.CENTER);
@@ -345,10 +339,11 @@ public class Gui {
             filmTable.setMaxWidth(800);
             filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }
-    }
+    }*/
 
-    private class CenterCustomers {
+    /*private class CenterCustomers {
         private TableView<Customer> customerTable;
+        private TableColumn<Customer, Integer> idColumn;
         private TableColumn<Customer, String> firstNameColumn;
         private TableColumn<Customer, String> lastNameColumn;
         private TableColumn<Customer, String> emailColumn;
@@ -360,9 +355,15 @@ public class Gui {
         private TableColumn<Customer, String> phoneColumn;
         private TableColumn<Customer, Timestamp> createDateColumn;
         private VBox centerVBox;
+        private GridPane customerGridPane;
         private ObservableList<Customer> customerObservableList;
         public void setupCenterCustomers() {
             customerTable = new TableView<>();
+
+            customerGridPane = new GridPane();
+            customerGridPane.setAlignment(Pos.CENTER);
+            customerGridPane.setHgap(10);
+            customerGridPane.setVgap(10);
 
             //TODO SDKG F
             customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
@@ -377,6 +378,8 @@ public class Gui {
         }
 
         private void setupCustomerTable() {
+            idColumn = new TableColumn<Customer, Integer>("Medlems nummer:");
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
             firstNameColumn = new TableColumn<Customer, String>("First name:");
             firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
             lastNameColumn = new TableColumn<Customer, String>("Last name");
@@ -425,6 +428,7 @@ public class Gui {
                 return new SimpleStringProperty(phoneName);
             });
 
+            customerTable.getColumns().add(idColumn);
             customerTable.getColumns().add(firstNameColumn);
             customerTable.getColumns().add(lastNameColumn);
             customerTable.getColumns().add(emailColumn);
@@ -441,24 +445,27 @@ public class Gui {
             customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         }
 
-    }
+    }*/
     public void launch() {
         top = new Top();
         left = new Left();
-        centerMovies = new CenterMovies();
-        centerCustomers = new CenterCustomers();
+        /*centerMovies = new CenterMovies();*/
+        customersGui = new CustomersGui(controller);
+        moviesGui = new MoviesGui(controller);
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
 
         top.setupTop();
         left.setupLeft();
-        centerMovies.setupCenter();
-        centerCustomers.setupCenterCustomers();
+        /*centerMovies.setupCenter();*/
+        moviesGui.setupMovies();
+        customersGui.setupCustomers();
 
         disableNavButtons();
         buttonActions();
-        filterTable();
+        moviesGui.moviesButtonsAndEvents();
+        /*filterFilmTable();*/
 
         primaryStage.setResizable(false);
         primaryStage.setMaximized(true);
@@ -479,60 +486,58 @@ public class Gui {
         handleCustomerButton();
 
         //CENTER
-        handleFilmTable();
+/*        handleFilmTable();
         handleAddMovieButton();
         handleDeleteMovieButton();
         handleUpdateMovieButton();
-        handleAddActorButton();
+        handleAddActorButton();*/
     }
 
     private void handleCustomerButton() {
-        left.customersButton.setOnMouseClicked(event-> {
+        left.customersButton.setOnMouseClicked(event -> {
             mainPane.setCenter(null);
             enableNavButtons();
             left.customersButton.setDisable(true);
-            centerCustomers.centerVBox.getChildren().clear();
-            centerCustomers.centerVBox.getChildren().addAll(centerCustomers.customerTable);
-            mainPane.setCenter(centerCustomers.centerVBox);
+            mainPane.setCenter(customersGui.setViewToCustomers());
         });
     }
 
     private void handleStaffButton() {
-        left.staffButton.setOnMouseClicked(event-> {
+        left.staffButton.setOnMouseClicked(event -> {
             enableNavButtons();
             left.staffButton.setDisable(true);
-            centerMovies.centerLabel.setText("Staff");
+            /*centerMovies.centerLabel.setText("Staff");*/
         });
     }
 
     private void handleReturnButton() {
-        left.returnButton.setOnMouseClicked(event-> {
+        left.returnButton.setOnMouseClicked(event -> {
             enableNavButtons();
             left.returnButton.setDisable(true);
-            centerMovies.centerLabel.setText("Return");
+            /*centerMovies.centerLabel.setText("Return");*/
         });
     }
 
     private void handleRentButton() {
-        left.rentButton.setOnMouseClicked(event-> {
+        left.rentButton.setOnMouseClicked(event -> {
             enableNavButtons();
             left.rentButton.setDisable(true);
-            centerMovies.centerLabel.setText("Rent");
+            /*centerMovies.centerLabel.setText("Rent");*/
         });
     }
 
     private void handleMoviesButton() {
-        left.moviesButton.setOnMouseClicked(event-> {
+        left.moviesButton.setOnMouseClicked(event -> {
             mainPane.setCenter(null);
             enableNavButtons();
             left.moviesButton.setDisable(true);
-            centerMovies.centerVBox.getChildren().clear();
-            centerMovies.centerVBox.getChildren().addAll(centerMovies.searchHBox, centerMovies.filmTable, centerMovies.labelsTextFieldsGridPane);
-            mainPane.setCenter(centerMovies.centerVBox);
+  /*          centerMovies.centerVBox.getChildren().clear();
+            centerMovies.centerVBox.getChildren().addAll(centerMovies.searchHBox, centerMovies.filmTable, centerMovies.moviesGridPane);*/
+            mainPane.setCenter(moviesGui.setViewToMovies());
         });
     }
 
-    private void handleAddMovieButton() {
+/*    private void handleAddMovieButton() {
         //TODO KAN DENNA LÖSAS SNYGGARE/BÄTTRE????? ANTAGLIGEN MEN HUR
         centerMovies.addMovieButton.setOnMouseClicked(event-> {
             String selectedTitle = centerMovies.titleTextField.getText();
@@ -550,8 +555,8 @@ public class Gui {
 
             double defaultRentalRate = 4.99;
             double defaultReplacementCost = 19.99;
-            /*BigDecimal defaultRentalRate = new BigDecimal("4.99");
-            BigDecimal defaultReplacementCost = new BigDecimal("19.99");*/
+            *//*BigDecimal defaultRentalRate = new BigDecimal("4.99");
+            BigDecimal defaultReplacementCost = new BigDecimal("19.99");*//*
 
             for(Category category : centerMovies.categoryObservableList) {
                 if(category.getName().equals(categoryChoiceBox)) {
@@ -582,7 +587,7 @@ public class Gui {
             filmDAO.create(film);
 
             updateFilmTable();
-            filterTable();
+            filterFilmTable();
         });
     }
 
@@ -596,9 +601,9 @@ public class Gui {
         centerMovies.deleteMovieButton.setOnMouseClicked(event-> {
             //TODO fixa detta
         });
-    }
+    }*/
 
-    private void handleAddActorButton() {
+/*    private void handleAddActorButton() {
         centerMovies.addActorButton.setOnMouseClicked(event -> {
             Actor actor = new Actor();
             String firstName = centerMovies.actorFirstNameTextField.getText().toUpperCase();
@@ -621,7 +626,7 @@ public class Gui {
                 //TODO hantera actor objet i kontrollern spara
             }
         });
-    }
+    }*/
 
     private void enableNavButtons() {
         left.moviesButton.setDisable(false);
@@ -641,28 +646,27 @@ public class Gui {
 
     private void handleChoseStoreSubmitButton() {
         //TODO CHANGE SUBMIT BUTTON TO CHOICEBOX EVENTHANDLER
-        top.choseStoreSubmitButton.setOnMouseClicked(event-> {
-            if(top.choseStoreChoiceBox.getValue()==null) {
+        top.choseStoreSubmitButton.setOnMouseClicked(event -> {
+            if (top.choseStoreChoiceBox.getValue() == null) {
                 return;
             }
-            if(top.choseStoreChoiceBox.getValue().equals("Store One")) {
+            if (top.choseStoreChoiceBox.getValue().equals("Store One")) {
                 top.storeLabel.setText("Store: 'Store One'");
                 enableNavButtons();
-            }
-            else {
+            } else {
                 top.storeLabel.setText("Store: 'Store Two'");
                 enableNavButtons();
             }
         });
     }
 
-    private void handleFilmTable() {
+/*    private void handleFilmTable() {
         centerMovies.filmTable.setOnMousePressed(event -> {
             Film selectedFilm = centerMovies.filmTable.getSelectionModel().getSelectedItem();
             List<Actor> actorList = selectedFilm.getActors();
             if (selectedFilm != null) {
-                String actors="";
-                for(int i=0; i<selectedFilm.getActors().size(); i++) {
+                String actors = "";
+                for (int i = 0; i < selectedFilm.getActors().size(); i++) {
                     actors += selectedFilm.getActors().get(i).getFirstName() + " " + selectedFilm.getActors().get(i).getLastName() + "\n";
                 }
                 centerMovies.titleTextField.setText(selectedFilm.getTitle());
@@ -679,9 +683,9 @@ public class Gui {
                 }
             }
         });
-    }
+    }*/
 
-    private void filterTable() {
+/*    private void filterFilmTable() {
         FilteredList<Film> filteredList = new FilteredList<>(centerMovies.filmObservableList, p -> true);
         centerMovies.searchTextFieldTitle.setPromptText("Search by title...");
         centerMovies.searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
@@ -755,9 +759,9 @@ public class Gui {
     private void updateFilmTable() {
         centerMovies.filmObservableList = FXCollections.observableList(filmDAO.getAll());
         centerMovies.filmTable.setItems(centerMovies.filmObservableList);
-    }
+    }*/
 
-    private TableCell<Film, Integer> formatTimeInTableViewCell() {
+/*    private TableCell<Film, Integer> formatTimeInTableViewCell() {
         return new TableCell<Film, Integer>() {
             @Override
             protected void updateItem(Integer minutes, boolean empty) {
@@ -771,4 +775,5 @@ public class Gui {
             }
         };
     }
+*/
 }
