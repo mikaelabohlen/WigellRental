@@ -14,7 +14,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        controller = new Controller(new ActorDAO(), new AddressDAO(), new CategoryDAO() , new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
+        controller = new Controller(new ActorDAO(), new AddressDAO(), new CategoryDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new LanguageDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
 
         mainGui = new MainGui(primaryStage, controller);
 
