@@ -1,6 +1,8 @@
 package org.example;
 
 import org.example.dao.*;
+
+import org.example.entities.Category;
 import org.example.entities.Actor;
 import org.example.entities.Film;
 import org.example.entities.Inventory;
@@ -18,6 +20,7 @@ public class Controller {
     private AddressDAO addressDAO;
     private CityDAO cityDAO;
     private CustomerDAO customerDAO;
+    private CategoryDAO categoryDAO;
     private FilmDAO filmDAO;
     private InventoryDAO inventoryDAO;
     private LanguageDAO languageDAO;
@@ -26,7 +29,7 @@ public class Controller {
     private StaffDAO staffDAO;
     private StoreDAO storeDAO;
 
-    public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, LanguageDAO languageDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
+    public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CategoryDAO categoryDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, LanguageDAO languageDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
         this.actorDAO = actorDAO;
         this.addressDAO = addressDAO;
         this.cityDAO = cityDAO;
@@ -38,6 +41,7 @@ public class Controller {
         this.rentalDAO = rentalDAO;
         this.staffDAO = staffDAO;
         this.storeDAO = storeDAO;
+        this.categoryDAO = categoryDAO;
     }
 
     public ActorDAO getActorDAO() {
@@ -54,6 +58,14 @@ public class Controller {
 
     public void setAddressDAO(AddressDAO addressDAO) {
         this.addressDAO = addressDAO;
+    }
+
+    public CategoryDAO getCategoryDAO() {
+        return categoryDAO;
+    }
+
+    public void setCategoryDAO(CategoryDAO categoryDAO) {
+        this.categoryDAO = categoryDAO;
     }
 
     public CityDAO getCityDAO() {

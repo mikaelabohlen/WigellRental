@@ -58,11 +58,11 @@ public class Film {
     @Column(name = "last_update")
     private Timestamp lastUpdate;
 
-    @ManyToMany(mappedBy = "films", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "films", fetch = FetchType.LAZY)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Actor> actors;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne()
     @JoinTable(name = "film_category",
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
@@ -71,6 +71,7 @@ public class Film {
 
 //    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
 //    private List<Inventory> inventories;
+
     @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)//TODO ändra till eager?
     private Set<Inventory> inventories;
 
