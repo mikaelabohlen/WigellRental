@@ -2,17 +2,10 @@ package org.example.dao;
 
 
 import org.example.entities.Country;
-
-public class CountryDAO extends AbstractDAO<Country> {
-    public CountryDAO() {
-        super(Country.class);
-
-import org.example.entities.City;
-import org.example.entities.Country;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-public class CountryDAO extends AbstractDAO{
+public class CountryDAO extends AbstractDAO<Country>{
     public CountryDAO(){super(Country.class);}
 
     public Country findById(int id) {
@@ -21,6 +14,5 @@ public class CountryDAO extends AbstractDAO{
             query.setParameter("id", id);
             return query.uniqueResult();
         }
-
     }
 }
