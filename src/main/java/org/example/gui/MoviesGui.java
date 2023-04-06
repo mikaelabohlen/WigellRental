@@ -52,13 +52,14 @@ public class MoviesGui {
     private ChoiceBox<Rating> ratingChoiceBox2;
     private ChoiceBox<String> languageChoiceBox;
     private TableColumn<Film, String> titleColumn;
-    private TableColumn<Film, Integer> releaseYearColumn, lengthColumn;
+    private TableColumn<Film, Integer> releaseYearColumn, lengthColumn, idColumn;
     private TableColumn<Film, Rating> ratingColumn;
     private TableColumn<Film, String> categoryColumn;
     private ObservableList<Film> filmObservableList;
     private ObservableList<Language> languageObservableList;
     private ObservableList<Category> categoryObservableList;
     private TextInputDialog actorSearchTextInputDialog;
+    private FilteredList<Film> filteredList;
 
     public MoviesGui(Controller controller) {
         this.controller = controller;
@@ -124,7 +125,7 @@ public class MoviesGui {
         LanguageDAO languageDAO = new LanguageDAO();
 
         List<Category> categoryList = controller.getCategoryDAO().getAll();
-        List<Film> films = controller.getFilmDAO().getAll();
+        List<Film> films = controller.getFilmDAO().getAllFilmsByStore(controller.getActiveStore());
         List<Language> languages = languageDAO.getAll();
 
         filmObservableList = FXCollections.observableList(films);
@@ -241,6 +242,9 @@ public class MoviesGui {
     private void setupFilmTable() {
         filmTable = new TableView<Film>();
 
+        idColumn = new TableColumn<Film, Integer>("Id:");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("filmId"));
+
         titleColumn = new TableColumn<Film, String>("Titel:");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
@@ -261,6 +265,7 @@ public class MoviesGui {
             return new SimpleStringProperty(categoryName);
         });
 
+        filmTable.getColumns().add(idColumn);
         filmTable.getColumns().add(titleColumn);
         filmTable.getColumns().add(releaseYearColumn);
         filmTable.getColumns().add(lengthColumn);
@@ -366,7 +371,7 @@ public class MoviesGui {
             filmTable.setItems(filmObservableList);
             Optional<String> searchInput = actorSearchTextInputDialog.showAndWait();
             searchInput.ifPresent(name -> {
-                FilteredList<Film> filteredList = new FilteredList<>(filmObservableList, film -> {
+                filteredList = new FilteredList<>(filmObservableList, film -> {
                     boolean actorMatch = false;
                     for (Actor actor : film.getActors()) {
                         if (actor.getFirstName().toLowerCase().contains(name.toLowerCase()) || actor.getLastName().toLowerCase().contains(name.toLowerCase()) ) {
@@ -408,7 +413,7 @@ public class MoviesGui {
     }
 
     private void filterFilmTableTitleCategoryRating() {
-        FilteredList<Film> filteredList = new FilteredList<>(filmObservableList, p -> true);
+        filteredList = new FilteredList<>(filmObservableList, p -> true);
         searchTextFieldTitle.setPromptText("Sök efter titel...");
         searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
             String searchTitle = searchTextFieldTitle.getText().toLowerCase();
