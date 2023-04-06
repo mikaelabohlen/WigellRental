@@ -1,12 +1,11 @@
 package org.example;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.example.dao.*;
 
-import org.example.entities.Category;
-import org.example.entities.Actor;
-import org.example.entities.Film;
-import org.example.entities.Inventory;
-import org.example.entities.Rental;
+import org.example.entities.*;
 import org.example.enums.Rating;
 
 import java.math.BigDecimal;
@@ -28,6 +27,8 @@ public class Controller {
     private RentalDAO rentalDAO;
     private StaffDAO staffDAO;
     private StoreDAO storeDAO;
+
+    private Store activeStore;
 
     public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CategoryDAO categoryDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, LanguageDAO languageDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
         this.actorDAO = actorDAO;
@@ -233,5 +234,34 @@ public class Controller {
             System.out.println(actor.getFirstName());
         }
         return actors;
+    }
+
+    public void updateCustomer(Customer customer) {
+        getCityDAO().update(customer.getAddress().city());
+        getAddressDAO().update(customer.getAddress());
+        getCustomerDAO().update(customer);
+    }
+
+    public void setActiveStore(String store) {
+        if(store.equals("1")) {
+            activeStore = storeDAO.read(1);
+            System.out.println(activeStore.getStoreId());
+        }
+        if(store.equals("2")) {
+            activeStore = storeDAO.read(2);
+            System.out.println(activeStore.getStoreId());
+        }
+    }
+
+    public Store getActiveStore() {
+        return activeStore;
+    }
+
+    public void createNewCustomer(Customer customer) {
+        //TODO inte klart
+        getCityDAO().create(customer.getAddress().city());
+        getAddressDAO().create(customer.getAddress());
+        customer.setStore(activeStore);
+        getCustomerDAO().create(customer);
     }
 }

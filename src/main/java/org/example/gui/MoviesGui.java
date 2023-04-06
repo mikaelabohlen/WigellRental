@@ -16,11 +16,9 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.example.Controller;
 import org.example.dao.CategoryDAO;
+import org.example.dao.InventoryDAO;
 import org.example.dao.LanguageDAO;
-import org.example.entities.Actor;
-import org.example.entities.Category;
-import org.example.entities.Film;
-import org.example.entities.Language;
+import org.example.entities.*;
 import org.example.enums.Rating;
 import org.example.utils.TimeUtil;
 import org.hibernate.Hibernate;
@@ -29,6 +27,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MoviesGui {
     private Controller controller;
