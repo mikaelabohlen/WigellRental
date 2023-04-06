@@ -201,4 +201,10 @@ public class Film {
     public void setInventories(Set<Inventory> inventories) {
         this.inventories = inventories;
     }
+
+    @Override
+    public String toString(){
+        Film film = new Film();
+        return "Film id=" + this.filmId + "title=" + this.title + "release year=" + this.releaseYear + ", description=" + this.description + ", rentalRate=" + this.rentalRate + "]";
+    }
 }
