@@ -58,21 +58,23 @@ public class Film {
     @Column(name = "last_update")
     private Timestamp lastUpdate;
 
-    @ManyToMany(mappedBy = "films", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "films", fetch = FetchType.LAZY)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Actor> actors;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @ManyToOne()
     @JoinTable(name = "film_category",
             joinColumns = {@JoinColumn (name = "film_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
-    private List<Category> categories;
+    private Category category;
+
 
 //    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
 //    private List<Inventory> inventories;
-    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)//TODO ändra till eager?
     private Set<Inventory> inventories;
+
 
     public int getFilmId() {
         return filmId;
@@ -186,12 +188,13 @@ public class Film {
         this.actors = actors;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
+
     }
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public Set<Inventory> getInventories() {
@@ -202,9 +205,30 @@ public class Film {
         this.inventories = inventories;
     }
 
-    @Override
-    public String toString(){
-        Film film = new Film();
-        return "Film id=" + this.filmId + "title=" + this.title + "release year=" + this.releaseYear + ", description=" + this.description + ", rentalRate=" + this.rentalRate + "]";
+
+    public Integer getTotalStock(int storeId){
+        int totalStock = 0;
+        for(Inventory inventory: this.getInventories()){
+            if(inventory.getStore().getStoreId() == storeId){
+                totalStock ++;
+            }
+        }
+        return totalStock;
+
+    }
+    
+    public Integer getInStock(int storeId){
+        int inStock = 0;
+        boolean rented;
+
+        for(Inventory inventory: this.getInventories()){
+            rented = inventory.getRental().getReturnDate() == null;
+            if (inventory.getStore().getStoreId() == storeId && !rented) {
+                inStock++;
+            }
+        }
+        return inStock;
+
     }
 }
+

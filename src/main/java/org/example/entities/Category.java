@@ -3,7 +3,6 @@ package org.example.entities;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "category")
@@ -19,7 +18,7 @@ public class Category {
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
-    @ManyToMany(mappedBy = "categories")
+    @OneToMany(mappedBy = "category")
 //    @JoinTable(name = "film_category",
 //            joinColumns = {@JoinColumn (name = "category_id")},
 //            inverseJoinColumns = {@JoinColumn(name = "film_id")}

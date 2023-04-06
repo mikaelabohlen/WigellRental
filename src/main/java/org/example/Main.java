@@ -2,16 +2,11 @@ package org.example;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.example.entities.Film;
-import org.example.gui.Gui;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
-import java.util.Iterator;
+import org.example.dao.*;
+import org.example.gui.MainGui;
 
 public class Main extends Application {
-    private Gui gui;
+    private MainGui mainGui;
     private Controller controller;
     public static void main(String[] args) {
         launch(args);
@@ -19,24 +14,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        controller = new Controller();
+        controller = new Controller(new ActorDAO(), new AddressDAO(), new CategoryDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new LanguageDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
 
-        // För att kontrollera att det går att hämta lägga till specialfatures
-//        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-//        Session session = sessionFactory.openSession();
-//        session.getTransaction().begin();
-//
-//        Film film = session.get(Film.class, 1);
-//        System.out.println(film.getSpecialFeatures());
-//        film.setSpecialFeatures("Deleted Scenes,Behind the Scenes");
-//
-//        session.update(film);
-//        session.getTransaction().commit();
-//        session.close();
+        mainGui = new MainGui(primaryStage, controller);
 
-
-        gui = new Gui(primaryStage, controller);
-
-        gui.launch();
+        mainGui.launch();
     }
 }

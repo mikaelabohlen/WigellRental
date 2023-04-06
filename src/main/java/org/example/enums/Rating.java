@@ -13,7 +13,8 @@ public enum Rating {
     PG("PG"),
     PG13("PG-13"),
     R("R"),
-    NC17("NC-17");
+    NC17("NC-17"),
+    ALL("G PG PG13 R NC17");
 
     private static final Map<String, Rating> LOOKUP = Arrays.stream(values())
             .collect(Collectors.toMap(Rating::getRating, Function.identity()));
