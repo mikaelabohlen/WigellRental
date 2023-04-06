@@ -1,5 +1,9 @@
 package org.example.gui;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,16 +11,23 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import org.example.Controller;
-import org.example.entities.Address;
-import org.example.entities.City;
-import org.example.entities.Country;
-import org.example.entities.Customer;
+import org.example.dao.CountryDAO;
+import org.example.dao.PaymentDAO;
+import org.example.entities.*;
 
+import java.awt.*;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CustomersGui {
 
@@ -28,21 +39,24 @@ public class CustomersGui {
 
     private TableView<Customer> customerTable;
     private TableColumn<Customer, Integer> idColumn;
-    private TableColumn<Customer, String> firstNameColumn, lastNameColumn, emailColumn, addressColumn, districtColumn, cityColumn, countryColumn, postalCodeColumn, phoneColumn;
+    private TableColumn<Customer, String> firstNameColumn, lastNameColumn, emailColumn, addressColumn, districtColumn/*, cityColumn*//*, countryColumn*/, postalCodeColumn/*,phoneColumn*/;
+    private TableColumn<Customer, Address> phoneColumn;
+    private TableColumn<Customer, Country> countryColumn;
+    private TableColumn<Customer, City> cityColumn;
     private TableColumn<Customer, Timestamp> createDateColumn; //TODO behövs denna?
-    private Label firstNameLabel, lastNameLabel, emailLabel, address1Label, address2Label, disctrictLabel, cityLabel, countryLabel, postalCodeLabel, phoneLabel;
-    private TextField firstNameTextField, lastNameTextField, emailTextField, address1TextField, address2TextField, districtTextField, cityTextField,countryTextField, postalCodeTextField, phoneTextField;
+    private Label firstNameLabel, lastNameLabel, emailLabel, address1Label, disctrictLabel, cityLabel, countryLabel, postalCodeLabel, phoneLabel;
+    private TextField firstNameTextField, lastNameTextField, emailTextField, address1TextField, districtTextField, cityTextField,countryTextField, postalCodeTextField, phoneTextField;
     private VBox centerVBox;
     private GridPane customerGridPane;
     private ObservableList<Customer> customerObservableList;
-    private Button addCustomerButton, deleteCustomerButton, updateCustomerButton;
+    private Button addCustomerButton, deleteCustomerButton, updateCustomerButton, updateCustomerTableButton;
+    private ChoiceBox<Country> countryChoiceBox;
 
     public void setupCustomers() {
         firstNameLabel = new Label("Förnamn:");
         lastNameLabel = new Label("Efternamn:");
         emailLabel = new Label("E-post:");
-        address1Label = new Label("Nr:");
-        address2Label = new Label("Adress:");
+        address1Label = new Label("Adress:");
         disctrictLabel = new Label("Distrikt:");
         cityLabel = new Label("Stad:");
         countryLabel = new Label("Land:");
@@ -53,7 +67,6 @@ public class CustomersGui {
         lastNameTextField = new TextField();
         emailTextField = new TextField();
         address1TextField = new TextField();
-        address2TextField = new TextField();
         districtTextField = new TextField();
         cityTextField = new TextField();
         countryTextField = new TextField();
@@ -63,6 +76,17 @@ public class CustomersGui {
         addCustomerButton = new Button("Lägg till kund");
         deleteCustomerButton = new Button("Ta bort kund");
         updateCustomerButton = new Button("Uppdatera kund");
+        updateCustomerTableButton = new Button("Uppdatera listan");
+
+        CountryDAO countryDao = new CountryDAO();
+        List<Country> countries = countryDao.getAll();
+
+        countryChoiceBox = new ChoiceBox<>();
+        countryChoiceBox.setConverter(createCountryStringConverter());
+
+        for(Country country : countries) {
+            countryChoiceBox.getItems().add(country);
+        }
 
         customerTable = new TableView<>();
 
@@ -79,14 +103,12 @@ public class CustomersGui {
         customerGridPane.add(emailTextField,5,0,1,1);
         customerGridPane.add(phoneLabel,6,0,1,1);
         customerGridPane.add(phoneTextField,7,0,1,1);
-        customerGridPane.add(address2Label,0,1,1,1);
-        customerGridPane.add(address2TextField,1,1,1,1);
-        customerGridPane.add(address1Label,2,1,1,1);
-        customerGridPane.add(address1TextField,3,1,1,1);
-        customerGridPane.add(disctrictLabel,4,1,1,1);
-        customerGridPane.add(districtTextField,5,1,1,1);
+        customerGridPane.add(address1Label,0,1,1,1);
+        customerGridPane.add(address1TextField,1,1,1,1);
+        customerGridPane.add(disctrictLabel,2,1,1,1);
+        customerGridPane.add(districtTextField,3,1,1,1);
         customerGridPane.add(countryLabel,0,2,1,1);
-        customerGridPane.add(countryTextField,1,2,1,1);
+        customerGridPane.add(countryChoiceBox,1,2,1,1);
         customerGridPane.add(postalCodeLabel,2,2,1,1);
         customerGridPane.add(postalCodeTextField,3,2,1,1);
         customerGridPane.add(cityLabel,4,2,1,1);
@@ -94,7 +116,9 @@ public class CustomersGui {
         customerGridPane.add(addCustomerButton,0,3,1,1);
         customerGridPane.add(deleteCustomerButton,0,4,1,1);
         customerGridPane.add(updateCustomerButton,0,5,1,1);
+        customerGridPane.add(updateCustomerTableButton,0,6,1,1);
         //TODO SDKG F
+
         customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
 
         setupCustomerTable();
@@ -104,6 +128,20 @@ public class CustomersGui {
         centerVBox.setPadding(new Insets(10, 10, 10, 10));
         centerVBox.setSpacing(10);
 
+    }
+
+    public Node setViewToCustomers() {
+        centerVBox.getChildren().clear();
+        centerVBox.getChildren().addAll(customerTable, customerGridPane);
+        return centerVBox;
+    }
+
+    public void customerButtonsAndEvents() {
+        handleAddCustomerButton();
+        handleDeleteCustomerButton();
+        handleUpdateCustomerButton();
+        handleCustomerTable();
+        handleUpdateTableButton();
     }
 
     private void setupCustomerTable() {
@@ -118,7 +156,7 @@ public class CustomersGui {
         addressColumn = new TableColumn<Customer, String>("Adress:");
         addressColumn.setCellValueFactory(cellData -> {
             Address address = cellData.getValue().getAddress();
-            String adressName = (address == null) ? "" : (address.getAddress() + " " + address.getAddress2());
+            String adressName = (address == null) ? "" : (address.getAddress());
             return new SimpleStringProperty(adressName);
         });
 
@@ -129,18 +167,16 @@ public class CustomersGui {
             return new SimpleStringProperty(districtName);
         });
 
-        cityColumn = new TableColumn<Customer, String>("Stad:");
+        cityColumn = new TableColumn<Customer, City>("Stad:");
         cityColumn.setCellValueFactory(cellData-> {
             City city = cellData.getValue().getAddress().city();
-            String cityName = (city == null) ? "" : (city.getCity());
-            return new SimpleStringProperty(cityName);
+            return new SimpleObjectProperty<City>(city);
         });
 
-        countryColumn = new TableColumn<Customer, String>("Land");
+        countryColumn = new TableColumn<Customer, Country>("Land");
         countryColumn.setCellValueFactory(cellData-> {
             Country country = cellData.getValue().getAddress().city().getCountry();
-            String countryName = (country == null) ? "" : (country.getCountry());
-            return new SimpleStringProperty(countryName);
+            return new SimpleObjectProperty<Country>(country);
         });
 
         postalCodeColumn = new TableColumn<Customer, String>("Postnummer:");
@@ -149,12 +185,24 @@ public class CustomersGui {
             String postalCodeName = (adress == null) ? "" : (adress.getPostalCode());
             return new SimpleStringProperty(postalCodeName);
         });
+        phoneColumn = new TableColumn<Customer, Address>("Telefon");
+        phoneColumn.setCellValueFactory(cellData -> {
+            return new SimpleObjectProperty<>(cellData.getValue().getAddress());
+        });
 
-        phoneColumn = new TableColumn<Customer, String>("Telefon:");
-        phoneColumn.setCellValueFactory(cellData-> {
-            Address address = cellData.getValue().getAddress();
-            String phoneName = (address == null) ? "" : (address.getPhone());
-            return new SimpleStringProperty(phoneName);
+        phoneColumn.setCellFactory(column -> {
+            return new TableCell<Customer, Address>() {
+                @Override
+                protected void updateItem(Address address, boolean empty) {
+                    super.updateItem(address, empty);
+
+                    if (address == null || empty) {
+                        setText(null);
+                    } else {
+                        setText(address.getPhone());
+                    }
+                }
+            };
         });
 
         customerTable.getColumns().add(idColumn);
@@ -167,16 +215,136 @@ public class CustomersGui {
         customerTable.getColumns().add(countryColumn);
         customerTable.getColumns().add(postalCodeColumn);
         customerTable.getColumns().add(phoneColumn);
-        customerTable.getItems().addAll(customerObservableList);
+
+        List<Customer> filteredCustomers = customerObservableList.stream()
+                .filter(customer -> customer.getStore().getStoreId() == controller.getActiveStore().getStoreId())
+                .collect(Collectors.toList());
+
+        customerTable.getItems().addAll(filteredCustomers);
 
         customerTable.setFocusTraversable(false);
         customerTable.setMaxWidth(1200);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    public Node setViewToCustomers() {
-        centerVBox.getChildren().clear();
-        centerVBox.getChildren().addAll(customerTable, customerGridPane);
-        return centerVBox;
+    private void handleCustomerTable() {
+        customerTable.setOnMouseClicked(event-> {
+            Customer selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
+            if(selectedCustomer!=null) {
+                firstNameTextField.setText(selectedCustomer.getFirstName());
+                lastNameTextField.setText(selectedCustomer.getLastName());
+                emailTextField.setText(selectedCustomer.getEmail());
+                phoneTextField.setText(selectedCustomer.getAddress().getPhone());
+                address1TextField.setText(selectedCustomer.getAddress().getAddress());
+                districtTextField.setText(selectedCustomer.getAddress().getDistrict());
+                countryChoiceBox.setValue(selectedCustomer.getAddress().city().getCountry());
+                postalCodeTextField.setText(selectedCustomer.getAddress().getPostalCode());
+                cityTextField.setText(selectedCustomer.getAddress().city().getCity());
+            }
+        });
+    }
+
+    private void handleUpdateTableButton() {
+        updateCustomerTableButton.setOnMouseClicked(event-> {
+            updateCustomerTable();
+        });
+    }
+
+    private void handleAddCustomerButton() {
+        addCustomerButton.setOnMouseClicked(event-> {
+            //TODO inte klart
+            City city = new City();
+            city.setCity(cityTextField.getText());
+            city.setCountry(countryChoiceBox.getValue());
+            city.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+
+            Address address = new Address();
+            address.setAddress(address1TextField.getText());
+            address.setAddress2(null);
+            address.setDistrict(districtTextField.getText());
+            address.setCity(city);
+            address.setPostalCode(postalCodeTextField.getText());
+            address.setPhone(phoneTextField.getText());
+            GeometryFactory gf = new GeometryFactory();
+            Coordinate coord = new Coordinate(10,20);
+            Point point = gf.createPoint(coord);
+            address.setLocation(point);
+            address.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+
+            Customer customer = new Customer();
+            customer.setFirstName(firstNameTextField.getText().toUpperCase());
+            customer.setLastName(lastNameTextField.getText().toUpperCase());
+            customer.setEmail(emailTextField.getText().toUpperCase());
+            customer.setAddress(address);
+            customer.setCreateDate(new Timestamp(System.currentTimeMillis()));
+
+            controller.createNewCustomer(customer);
+
+        });
+    }
+
+    private void handleDeleteCustomerButton() {
+        deleteCustomerButton.setOnMouseClicked(event-> {
+            //TODO går ej att ta bort på grund av fk constraint payment. hur göra?
+
+            Customer customer = customerTable.getSelectionModel().getSelectedItem();
+            controller.getCustomerDAO().delete(customer.getCustomerId());
+        });
+    }
+
+    private void handleUpdateCustomerButton() {
+        updateCustomerButton.setOnMouseClicked(event-> {
+            Customer customer = customerTable.getSelectionModel().getSelectedItem();
+            if(customer==null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Du måste välja en kund ifrån listan");
+                alert.setHeaderText("Ingen kund vald");
+                alert.setTitle("Fel vid uppdatering");
+                alert.showAndWait();
+                return;
+            }
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setHeaderText("Uppdatera");
+            alert.setContentText("Är du säker på att du vill uppdatera vald kund?");
+
+            ButtonType yesButton = new ButtonType("Ja");
+            ButtonType noButton = new ButtonType("Nej");
+
+            alert.getButtonTypes().setAll(yesButton, noButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == yesButton) {
+                customer.setFirstName(firstNameTextField.getText().toUpperCase());
+                customer.setLastName(lastNameTextField.getText().toUpperCase());
+                customer.setEmail(emailTextField.getText().toUpperCase());
+                customer.getAddress().city().setCountry(countryChoiceBox.getValue());
+                customer.getAddress().setPhone(phoneTextField.getText());
+                customer.getAddress().setAddress(address1TextField.getText());
+                customer.getAddress().setDistrict(districtTextField.getText());
+                customer.getAddress().setPostalCode(postalCodeTextField.getText());
+                customer.getAddress().city().setCity(cityTextField.getText());
+
+                controller.updateCustomer(customer);
+            }
+
+        });
+    }
+
+    private void updateCustomerTable() {
+        customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
+        customerTable.setItems(customerObservableList);
+    }
+
+    private StringConverter<Country> createCountryStringConverter() {
+        return new StringConverter<Country>() {
+            @Override
+            public String toString(Country country) {
+                return country.getCountry();
+            }
+
+            @Override
+            public Country fromString(String string) {
+                return null;
+            }
+        };
     }
 }

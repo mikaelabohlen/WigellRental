@@ -2,6 +2,7 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
 @Table(name = "city")
@@ -52,5 +53,21 @@ public class City {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        return city;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof City)) {
+            return false;
+        }
+        City other = (City) obj;
+        return Objects.equals(city, other.city);
+    }
 }
+

@@ -1,5 +1,7 @@
 package org.example.entities;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;

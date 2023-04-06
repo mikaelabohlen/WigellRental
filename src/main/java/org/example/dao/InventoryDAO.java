@@ -2,8 +2,7 @@ package org.example.dao;
 
 import org.example.entities.Actor;
 import org.example.entities.Inventory;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+
 
 import java.util.List;
 
