@@ -205,6 +205,7 @@ public class Film {
         this.inventories = inventories;
     }
 
+
     public Integer getTotalStock(int storeId){
         int totalStock = 0;
         for(Inventory inventory: this.getInventories()){
@@ -227,6 +228,7 @@ public class Film {
             }
         }
         return inStock;
+
     }
 }
 
