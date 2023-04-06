@@ -6,9 +6,11 @@ import com.vividsolutions.jts.geom.Point;
 import org.example.dao.*;
 
 import org.example.entities.*;
+
 import org.example.enums.Rating;
 
 import java.math.BigDecimal;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -141,100 +143,80 @@ public class Controller {
         this.storeDAO = storeDAO;
     }
 
-    public List<Film> getAllFilms(){
+    public List<Film> getAllFilms() {
         return filmDAO.getAll();
     }
 
-    public void rentFilms(List<Film> filmsToRent, int storeId, int customerId){
-        for(Film film: filmsToRent){
-            List<Inventory> inventories = new ArrayList<>(film.getInventories());
-            Inventory inventory = null;
 
-            for(Inventory inventoryItem: inventories){
-                boolean rented = inventoryItem.getRental().getReturnDate() == null;
-                if(storeId == inventoryItem.getStore().getStoreId() && !rented){
-                    inventory = inventoryItem;
-                    break;
+    public Inventory canFilmBeRented(Film selectedFilm, int storeId) {
+        List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
+        for (Inventory inventoryItem : inventories) {
+            System.out.println("InventoryId: "+inventoryItem.getInventoryId()+ "\n\n\n\n\n\n\n");
+            if(storeId == inventoryItem.getStore().getStoreId()) {
+                List<Rental> rentalsForInventory = rentalDAO.getRentalsForInventory(inventoryItem.getInventoryId());
+                System.out.println(rentalsForInventory.size());
+                if(rentalsForInventory.size() == 0){
+                    return inventoryItem;
+                }
+                boolean currentlyRented = false;
+                for (Rental rental : rentalsForInventory) {
+                    System.out.println("Rental returnDate: "+rental.getReturnDate()+ "\n\n\n\n\n");
+                    if(rental.getReturnDate() == null){
+                        System.out.println("Denna är uthyrd");
+                        currentlyRented = true;
+                        break;
+                    }
+                }
+                if(!currentlyRented) {
+                    return inventoryItem;
                 }
             }
-
-            Rental rental = new Rental();
-            rental.setRentalDate(LocalDateTime.now());
-            rental.setInventory(inventory);
-            rental.setCustomer(customerDAO.read(customerId));
-            rental.setStaff(storeDAO.read(storeId).getManagerStaff());
-            rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-
-            rentalDAO.create(rental); //kolla upp cascade... uppdateras alla som påverkas?
-
         }
-    }
-    public void createNewFilm (Film film) {
-/*        Film film = new Film();
-        film.setTitle("Solen");
-        film.setDescription("Bla bla bla...");
-        film.setReleaseYear(2012);
-        film.setLanguage(languageDAO.read(1));
-        film.setOriginalLanguage(languageDAO.read(1));
-        film.setRentalDuration(3);
-        film.setRentalRate(new BigDecimal(3.44));
-        film.setLength(34);
-        film.setReplacementCost(new BigDecimal(3.44));
-        film.setRating(Rating.NC17);
-        film.setSpecialFeatures("Trailers");
-        film.setLastUpdate(new Timestamp(System.currentTimeMillis()));*/
-
-        filmDAO.create(film);
+        System.out.println("No item available");
+        return null;
     }
 
-    void connectionActorFilm(Film film, List<Actor> actorList) {
-/*        Film film = filmDAO.read(1004);
-        film.setRentalDuration(3);
-        film.setRentalRate(new BigDecimal(4.99));
-        filmDAO.update(film);*/
+    //                List<Timestamp> timestamps = (List<Timestamp>) rental.getReturnDate();
+//                for(Timestamp timestamp : timestamps){
+//                    if(!(timestamp == null)&&storeId == inventoryItem.getStore().getStoreId()){
+//                        currentlyRented = false;
+//                        inventory = inventoryItem;
+//                        break;
+//                    }
+//                }
+    public void createRental(int inventoryId, int storeId, int customerId) {
+        Rental rental = new Rental();
+        rental.setRentalDate(LocalDateTime.now());
+        rental.setInventory(inventoryDAO.read(inventoryId));
+        rental.setCustomer(customerDAO.read(customerId));
+        rental.setStaff(storeDAO.read(storeId).getManagerStaff());
+        rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        rentalDAO.create(rental); //kolla upp cascade... uppdateras alla som påverkas?
+    }
 
-/*        Store store = controller.getStoreDAO().read(1);
+    private Inventory createInventory(int filmId, int storeId) {
         Inventory inventory = new Inventory();
-        inventory.setFilm(film);
-        inventory.setStore(store);
-        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        controller.getInventoryDAO().create(inventory);*/
-
-        Actor actor1 = actorDAO.read(1);
-        Actor actor2 = actorDAO.read(5);
-        Actor actor3 = actorDAO.read(3);
-
-        actor1.addOneMovie(film);
-        actor2.addOneMovie(film);
-        actor3.addOneMovie(film);
-
-        actorDAO.update(actor1);
-        actorDAO.update(actor2);
-        actorDAO.update(actor3);
-        /*List<Actor> actorList = new ArrayList<>();
-        actorList.add(actor1);
-        actorList.add(actor2);
-        actorList.add(actor3);
-        film.setActors(actorList);
-        controller.getFilmDAO().update(film);*/
-
-
-
-/*        Film film = controller.getFilmDAO().read(1);
-        Actor actor = controller.getActorDAO().read(2);
-        actor.addOneMovie(film);
-        controller.getActorDAO().update(actor);
-        controller.getFilmDAO().update(film);*/
+        inventory.setFilm(filmDAO.read(filmId));
+        inventory.setStore(storeDAO.read(storeId));
+        return inventory;
     }
-    public List<Actor> getActors(Film selectedFilm) {
-//        return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
-        List<Actor> actors = actorDAO.getActorsForFilm(selectedFilm.getFilmId());
 
-        for(Actor actor: actors){
-            System.out.println(actor.getFirstName());
+    public void createNewFilm(Film film, List<Actor> actors) {
+        filmDAO.create(film);
+        connectActorWithFilm(film, actors);
+    }
+
+    void connectActorWithFilm(Film film, List<Actor> actors) {
+        for (Actor actor : actors) {
+            actor.addOneMovie(film);
+            actorDAO.update(actor);
         }
-        return actors;
     }
+
+    public List<Actor> getActors(Film selectedFilm) {
+        return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
+    }
+
 
     public void updateCustomer(Customer customer) {
         getCityDAO().update(customer.getAddress().city());
@@ -264,4 +246,8 @@ public class Controller {
         customer.setStore(activeStore);
         getCustomerDAO().create(customer);
     }
+
+//    public void rentFilm() {
+//    }
+
 }

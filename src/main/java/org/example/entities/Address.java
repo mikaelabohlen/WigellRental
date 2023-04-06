@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,6 +35,9 @@ public class Address implements Serializable {
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
+
+    @Transient
+    GeometryFactory geometryFactory = new GeometryFactory();
 
     public Address() {
     }
