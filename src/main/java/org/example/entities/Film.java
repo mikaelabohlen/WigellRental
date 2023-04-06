@@ -208,13 +208,13 @@ public class Film {
 
     public Integer getTotalStock(int storeId){
         int totalStock = 0;
+
         for(Inventory inventory: this.getInventories()){
             if(inventory.getStore().getStoreId() == storeId){
                 totalStock ++;
             }
         }
         return totalStock;
-
     }
     
     public Integer getInStock(int storeId){
@@ -222,9 +222,11 @@ public class Film {
         boolean rented;
 
         for(Inventory inventory: this.getInventories()){
-            rented = inventory.getRental().getReturnDate() == null;
-            if (inventory.getStore().getStoreId() == storeId && !rented) {
-                inStock++;
+            for(Rental rental: inventory.getRentals()){
+                rented = rental.getReturnDate() == null;
+                if (inventory.getStore().getStoreId() == storeId && !rented) {
+                    inStock++;
+                }
             }
         }
         return inStock;

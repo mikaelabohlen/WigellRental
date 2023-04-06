@@ -6,6 +6,7 @@ import org.example.entities.Film;
 import org.example.entities.Inventory;
 import org.example.entities.Store;
 import org.example.enums.Rating;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,8 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertFalse;
 
 class ControllerTest {
     private Controller controller;
@@ -24,17 +27,14 @@ class ControllerTest {
 
     @Test
     void doesFilmGetRented() {
-        Film film = controller.getFilmDAO().read(3);
-
-//        System.out.println(film.getTotalStock(1));
-//        System.out.println(film.getInStock(1));
-
-        List<Film> filmsToRent = new ArrayList<>();
-        filmsToRent.add(film);
-        controller.rentFilms(filmsToRent, 1,1);
-
-//        System.out.println(film.getTotalStock(1));
-//        System.out.println(film.getInStock(1));
+        Film film = controller.getFilmDAO().read(1);
+        Inventory inventory = controller.canFilmBeRented(film,1);
+        if(!(inventory ==null)) {
+            controller.createRental(inventory.getInventoryId(), inventory.getStore().getStoreId(), controller.getCustomerDAO().read(1).getCustomerId());
+        } else{
+            System.out.println("Win!!!");
+        }
+//        Assertions.assertFalse(controller.rentFilms(filmsToRent, 1,1));
     }
     @Test
     void createNewFilm () {
