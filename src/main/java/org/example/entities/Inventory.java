@@ -2,6 +2,7 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "inventory")
@@ -21,8 +22,8 @@ public class Inventory {
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
-    @OneToOne(mappedBy = "inventory")
-    private Rental rental;
+    @OneToMany(mappedBy = "inventory", fetch = FetchType.EAGER)
+    private List<Rental> rentals;
 
     public Integer getInventoryId() {
         return inventoryId;
@@ -56,11 +57,11 @@ public class Inventory {
         this.lastUpdate = lastUpdate;
     }
 
-    public Rental getRental() {
-        return rental;
+    public List<Rental> getRentals() {
+        return rentals;
     }
 
-    public void setRental(Rental rental) {
-        this.rental = rental;
+    public void setRental(List<Rental> rentals) {
+        this.rentals = rentals;
     }
 }

@@ -35,7 +35,7 @@ class FilmTest {
         List<Inventory> inventories = new ArrayList<>(film.getInventories());
 
         for (Inventory inventory : inventories) {
-            System.out.println(inventory.getRental());
+            System.out.println(inventory.getRentals());
         }
 
         System.out.println(film.getTotalStock(1));
