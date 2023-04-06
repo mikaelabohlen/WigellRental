@@ -126,6 +126,7 @@ public class MainGui {
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
+        mainScene.getStylesheets().add("style.css");
 
         top.setupTop();
         left.setupLeft();
@@ -216,14 +217,12 @@ public class MainGui {
             if (top.choseStoreChoiceBox.getValue().equals("Butik 1")) {
                 top.storeLabel.setText("Butik: 'Butik 1'");
                 controller.setActiveStore("1");
-                enableNavButtons();
-                mainPane.setCenter(null);
             } else {
                 top.storeLabel.setText("Butik: 'Butik 2'");
                 controller.setActiveStore("2");
-                enableNavButtons();
-                mainPane.setCenter(null);
             }
+            enableNavButtons();
+            mainPane.setCenter(null);
             initiate();
         });
     }
