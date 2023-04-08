@@ -325,19 +325,15 @@ public class Controller {
         Customer customer = getCustomerDAO().read(Integer.parseInt(customerId));
         rental.setCustomer(customer);
 
-        Inventory inventory = new Inventory();
-        inventory.setFilm(selectedFilm);
-        inventory.setStore(activeStore);
-        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        inventoryDAO.create(inventory);
 
+        Inventory inventory = selectedFilm.getInventories().iterator().next();
         rental.setInventory(inventory);
         rentalDAO.create(rental);
 
     }
 
     public List<Film> getRentals(int customerId) {
-        return filmDAO.getCurrentlyRentedFilmsForCustomer(customerId);
+        return filmDAO.getAllRentedFilmsForCustomer(customerId);
     }
 
 //    public void rentFilm() {
