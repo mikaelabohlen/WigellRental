@@ -27,6 +27,7 @@ public class MainGui {
     private CustomersGui customersGui;
     private MoviesGui moviesGui;
     private RentGui rentGui;
+    private ReturnGui returnGui;
 
 
     public MainGui(Stage primaryStage, Controller controller) {
@@ -116,6 +117,7 @@ public class MainGui {
         customersGui = new CustomersGui(controller);
         moviesGui = new MoviesGui(controller);
         rentGui = new RentGui(controller);
+        returnGui = new ReturnGui(controller);
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
@@ -164,8 +166,10 @@ public class MainGui {
 
     private void handleReturnButton() {
         left.returnButton.setOnMouseClicked(event -> {
+            mainPane.setCenter(null);
             enableNavButtons();
             left.returnButton.setDisable(true);
+            mainPane.setCenter(returnGui.setViewToReturn());
         });
     }
 
@@ -229,5 +233,6 @@ public class MainGui {
         customersGui.buttonsAndEvents();
         rentGui.setup();
         rentGui.buttonsAndEvents();
+        returnGui.setup();
     }
 }

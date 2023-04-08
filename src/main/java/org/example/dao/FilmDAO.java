@@ -39,5 +39,28 @@ public class FilmDAO extends AbstractDAO<Film>{
             return films;
         }
     }
+
+    public List<Film> getAllRentedFilmsForCustomer(int customerId) {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId");
+            query.setParameter("customerId", customerId);
+            List<Film> films = query.getResultList();
+            session.getTransaction().commit();
+            return films;
+        }
+    }
+
+    public List<Film> getCurrentlyRentedFilmsForCustomer(int customerId) {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId AND r.rentalDate <= CURRENT_DATE() AND (r.returnDate IS NULL OR r.returnDate >= CURRENT_DATE())");
+            query.setParameter("customerId", customerId);
+            List<Film> films = query.getResultList();
+            session.getTransaction().commit();
+            return films;
+        }
+    }
+
 }
 
