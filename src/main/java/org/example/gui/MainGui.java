@@ -234,5 +234,6 @@ public class MainGui {
         rentGui.setup();
         rentGui.buttonsAndEvents();
         returnGui.setup();
+        returnGui.buttonAndEvents();
     }
 }

@@ -27,7 +27,7 @@ public class Rental {
     private Customer customer;
 
     @Column(name = "return_date", columnDefinition = "default NULL")
-    private Timestamp returnDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
+    private LocalDateTime returnDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
 
     @OneToOne
     @JoinColumn(name = "staff_id", nullable = false)
@@ -68,11 +68,11 @@ public class Rental {
         this.customer = customer;
     }
 
-    public Timestamp getReturnDate() {
+    public LocalDateTime getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Timestamp returnDate) {
+    public void setReturnDate(LocalDateTime returnDate) {
         this.returnDate = returnDate;
     }
 

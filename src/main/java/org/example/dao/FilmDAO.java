@@ -43,7 +43,7 @@ public class FilmDAO extends AbstractDAO<Film>{
     public List<Film> getAllRentedFilmsForCustomer(int customerId) {
         try (Session session = getSession()) {
             session.beginTransaction();
-            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId");
+            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId AND r.returnDate IS NULL");
             query.setParameter("customerId", customerId);
             List<Film> films = query.getResultList();
             session.getTransaction().commit();
@@ -54,7 +54,7 @@ public class FilmDAO extends AbstractDAO<Film>{
     public List<Film> getCurrentlyRentedFilmsForCustomer(int customerId) {
         try (Session session = getSession()) {
             session.beginTransaction();
-            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId AND r.rentalDate <= CURRENT_DATE() AND (r.returnDate IS NULL OR r.returnDate >= CURRENT_DATE())");
+            Query query = session.createQuery("SELECT f FROM Film f JOIN f.inventories i JOIN i.rentals r WHERE r.customer.customerId = :customerId AND r.rentalDate <= CURRENT_DATE() AND r.returnDate IS NULL");
             query.setParameter("customerId", customerId);
             List<Film> films = query.getResultList();
             session.getTransaction().commit();
