@@ -5,7 +5,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,10 +19,8 @@ import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.example.Controller;
 import org.example.dao.CountryDAO;
-import org.example.dao.PaymentDAO;
 import org.example.entities.*;
 
-import java.awt.*;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +48,9 @@ public class CustomersGui {
     private ObservableList<Customer> customerObservableList;
     private Button addCustomerButton, deleteCustomerButton, updateCustomerButton, updateCustomerTableButton;
     private ChoiceBox<Country> countryChoiceBox;
+    private List<Customer> filteredCustomers;
 
-    public void setupCustomers() {
+    public void setup() {
         firstNameLabel = new Label("Förnamn:");
         lastNameLabel = new Label("Efternamn:");
         emailLabel = new Label("E-post:");
@@ -119,7 +117,7 @@ public class CustomersGui {
         customerGridPane.add(updateCustomerTableButton,0,6,1,1);
         //TODO SDKG F
 
-        customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
+        customerObservableList = controller.getCustomerObservableList();
 
         setupCustomerTable();
 
@@ -136,7 +134,7 @@ public class CustomersGui {
         return centerVBox;
     }
 
-    public void customerButtonsAndEvents() {
+    public void buttonsAndEvents() {
         handleAddCustomerButton();
         handleDeleteCustomerButton();
         handleUpdateCustomerButton();
@@ -216,12 +214,11 @@ public class CustomersGui {
         customerTable.getColumns().add(postalCodeColumn);
         customerTable.getColumns().add(phoneColumn);
 
-        List<Customer> filteredCustomers = customerObservableList.stream()
+        filteredCustomers = customerObservableList.stream()
                 .filter(customer -> customer.getStore().getStoreId() == controller.getActiveStore().getStoreId())
                 .collect(Collectors.toList());
 
         customerTable.getItems().addAll(filteredCustomers);
-
         customerTable.setFocusTraversable(false);
         customerTable.setMaxWidth(1200);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -246,6 +243,7 @@ public class CustomersGui {
 
     private void handleUpdateTableButton() {
         updateCustomerTableButton.setOnMouseClicked(event-> {
+            controller.updateCustomerList();
             updateCustomerTable();
         });
     }
@@ -330,8 +328,11 @@ public class CustomersGui {
     }
 
     private void updateCustomerTable() {
-        customerObservableList = FXCollections.observableList(controller.getCustomerDAO().getAll());
-        customerTable.setItems(customerObservableList);
+        customerObservableList = controller.getCustomerObservableList();
+        filteredCustomers = customerObservableList.stream()
+                .filter(customer -> customer.getStore().getStoreId() == controller.getActiveStore().getStoreId())
+                .collect(Collectors.toList());
+        customerTable.getItems().addAll(filteredCustomers);
     }
 
     private StringConverter<Country> createCountryStringConverter() {

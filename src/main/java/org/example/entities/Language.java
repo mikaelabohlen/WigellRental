@@ -42,5 +42,9 @@ public class Language {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 
 }
