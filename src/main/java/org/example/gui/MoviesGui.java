@@ -1,7 +1,6 @@
 package org.example.gui;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
@@ -15,58 +14,49 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.example.Controller;
-import org.example.dao.CategoryDAO;
-import org.example.dao.InventoryDAO;
-import org.example.dao.LanguageDAO;
 import org.example.entities.*;
 import org.example.enums.Rating;
 import org.example.utils.TimeUtil;
-import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 public class MoviesGui {
+
     private Controller controller;
 
-    //private FilmDAO filmDAO;
-
     private Label titleLabel, descriptionLabel, releaseYearLabel, languageLabel, lengthLabel, ratingLabel, categoryLabel, specialFeaturesLabel, actorsLabel;
-    private Label actorFirstNameLabel, actorLastNameLabel;
+    private Label actorFirstNameLabel, actorLastNameLabel, searchCategoryLabel, searchRatingLabel;
     private TextField titleTextField, releaseYearTextField, lengthTextField, specialFeaturesTextField;
-    private TextField searchTextFieldTitle;
+    private TextField searchTitleTextField, searchActorTextField;
     private TextField actorFirstNameTextField, actorLastNameTextField;
     private TextArea descriptionTextArea, actorsTextArea;
     private ListView<String> actorsListView;
-    private GridPane moviesGridPane;
-    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton, listByActorButton;
+    private GridPane moviesGridPane, searchGridPane;
+    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton, clearSearchButton, updateListButton;
     private VBox centerVBox;
     private HBox searchHBox;
     private TableView<Film> filmTable;
-    private ChoiceBox<String> categoryChoiceBox;
-    private ChoiceBox<String> categoryChoiceBox2;
-    private ChoiceBox<Rating> ratingChoiceBox;
-    private ChoiceBox<Rating> ratingChoiceBox2;
-    private ChoiceBox<String> languageChoiceBox;
-    private TableColumn<Film, String> titleColumn;
+    private ChoiceBox<Category> searchCategoryChoiceBox, categoryChoiceBox2;
+    private ChoiceBox<Rating> searchRatingChoiceBox, ratingChoiceBox2;
+    private ChoiceBox<Language> languageChoiceBox;
+    private TableColumn<Film, String> titleColumn, categoryColumn;
     private TableColumn<Film, Integer> releaseYearColumn, lengthColumn, idColumn;
     private TableColumn<Film, Rating> ratingColumn;
-    private TableColumn<Film, String> categoryColumn;
     private ObservableList<Film> filmObservableList;
     private ObservableList<Language> languageObservableList;
     private ObservableList<Category> categoryObservableList;
-    private TextInputDialog actorSearchTextInputDialog;
     private FilteredList<Film> filteredList;
 
     public MoviesGui(Controller controller) {
         this.controller = controller;
     }
-    public void setupMovies() {
+    public void setup() {
         titleLabel = new Label("Titel:");
-        descriptionLabel = new Label("Beskriving:");
+        descriptionLabel = new Label("Beskrivning:");
         releaseYearLabel = new Label("Utgivningsår:");
         lengthLabel = new Label("Längd:");
         categoryLabel = new Label("Kategori:");
@@ -77,21 +67,30 @@ public class MoviesGui {
         actorFirstNameLabel = new Label("Förnamn:");
         actorLastNameLabel = new Label("Efternamn:");
 
+        searchCategoryLabel = new Label("Kategori:");
+        searchRatingLabel = new Label("Åldersgräns:");
+
         addMovieButton = new Button("Lägg till film");
         updateMovieButton = new Button("Uppdatera film");
         deleteMovieButton = new Button("Radera film");
         createMovieButton = new Button("Skapa ny film");
         addActorButton = new Button("Lägg till skådespelare");
-        listByActorButton = new Button("Sök Skådespelare");
+        clearSearchButton = new Button("Rensa sökning");
+        updateListButton = new Button("Uppdatera listan");
 
         titleTextField = new TextField();
         releaseYearTextField = new TextField();
         lengthTextField = new TextField();
         specialFeaturesTextField = new TextField();
-        searchTextFieldTitle = new TextField();
-        searchTextFieldTitle.setFocusTraversable(false);
         actorFirstNameTextField = new TextField();
         actorLastNameTextField = new TextField();
+
+        searchTitleTextField = new TextField();
+        searchTitleTextField.setPromptText("Sök på titel");
+        searchTitleTextField.setFocusTraversable(false);
+        searchActorTextField = new TextField();
+        searchActorTextField.setFocusTraversable(false);
+        searchActorTextField.setPromptText("Sök på skådespelare");
 
         descriptionTextArea = new TextArea();
         descriptionTextArea.setMaxHeight(100);
@@ -109,63 +108,63 @@ public class MoviesGui {
         actorsListView.setEditable(true);
         actorsListView.setCellFactory(TextFieldListCell.forListView());
 
-        categoryChoiceBox = new ChoiceBox<>();
+        searchCategoryChoiceBox = new ChoiceBox<>();
         categoryChoiceBox2 = new ChoiceBox<>();
-        ratingChoiceBox = new ChoiceBox<>();
+        searchRatingChoiceBox = new ChoiceBox<>();
         ratingChoiceBox2 = new ChoiceBox<>();
         languageChoiceBox = new ChoiceBox<>();
 
-        actorSearchTextInputDialog = new TextInputDialog("Sök på skådespelare");
-        actorSearchTextInputDialog.setTitle("Sök skådespelare");
-        actorSearchTextInputDialog.setHeaderText("Ange namnet på den skådespelare du vill söka på");
+        filmObservableList = controller.getFilmObservableList();
+        languageObservableList = controller.getLanguageObservableList();
+        categoryObservableList = controller.getCategoryObservableList();
 
-        //filmDAO = new FilmDAO();
+        languageChoiceBox.setItems(languageObservableList);
 
-        CategoryDAO categoryDAO = new CategoryDAO();
-        LanguageDAO languageDAO = new LanguageDAO();
+        searchCategoryChoiceBox.setItems(categoryObservableList);
 
-        List<Category> categoryList = controller.getCategoryDAO().getAll();
-        List<Film> films = controller.getFilmDAO().getAllFilmsByStore(controller.getActiveStore());
-        List<Language> languages = languageDAO.getAll();
+        categoryChoiceBox2.setItems(categoryObservableList);
 
-        filmObservableList = FXCollections.observableList(films);
-        languageObservableList = FXCollections.observableList(languages);
-        categoryObservableList = FXCollections.observableList(categoryList);
+        filteredList = new FilteredList<>(filmObservableList, p -> true);
 
-        for (Language language : languages) {
-            languageChoiceBox.getItems().add(language.getName());
-        }
+        searchRatingChoiceBox.getItems().add(Rating.G);
+        searchRatingChoiceBox.getItems().add(Rating.PG);
+        searchRatingChoiceBox.getItems().add(Rating.PG13);
+        searchRatingChoiceBox.getItems().add(Rating.NC17);
+        searchRatingChoiceBox.getItems().add(Rating.R);
 
-        categoryChoiceBox.getItems().add("Alla kategorier");
-        for (Category category : categoryList) {
-            categoryChoiceBox.getItems().add(category.getName());
-        }
-        categoryChoiceBox.setValue("Alla kategorier");
-
-        for (Category category : categoryList) {
-            categoryChoiceBox2.getItems().add(category.getName());
-        }
-
-        ratingChoiceBox.getItems().add(Rating.ALL);
-        ratingChoiceBox.getItems().add(Rating.G);
-        ratingChoiceBox.getItems().add(Rating.PG);
-        ratingChoiceBox.getItems().add(Rating.PG13);
-        ratingChoiceBox.getItems().add(Rating.NC17);
-        ratingChoiceBox.getItems().add(Rating.R);
-        ratingChoiceBox.setValue(Rating.ALL);
-        ratingChoiceBox.setConverter(new StringConverter<Rating>() {
+        searchRatingChoiceBox.setConverter(new StringConverter<Rating>() {
             @Override
             public String toString(Rating rating) {
-                if (rating == Rating.ALL) {
-                    return "Alla åldersgränser";
-                } else {
-                    return rating.toString();
-                }
+                return rating.toString();
             }
             @Override
             public Rating fromString(String string) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
+        });
+
+        searchActorTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateFilteredList(newValue.toLowerCase(), searchTitleTextField.getText().toLowerCase(),
+                    searchCategoryChoiceBox.getValue(), searchRatingChoiceBox.getValue());
+            filmTable.setItems(filteredList);
+        });
+
+        searchTitleTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateFilteredList(searchActorTextField.getText().toLowerCase(), newValue.toLowerCase(),
+                    searchCategoryChoiceBox.getValue(), searchRatingChoiceBox.getValue());
+            filmTable.setItems(filteredList);
+        });
+
+        searchCategoryChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateFilteredList(searchActorTextField.getText().toLowerCase(), searchTitleTextField.getText().toLowerCase(),
+                    newValue, searchRatingChoiceBox.getValue());
+            filmTable.setItems(filteredList);
+        });
+
+        searchRatingChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateFilteredList(searchActorTextField.getText().toLowerCase(), searchTitleTextField.getText().toLowerCase(),
+                    searchCategoryChoiceBox.getValue(), newValue);
+            filmTable.setItems(filteredList);
         });
 
         ratingChoiceBox2.getItems().add(Rating.G);
@@ -200,19 +199,33 @@ public class MoviesGui {
         moviesGridPane.add(actorsListView, 3, 2, 1, 1);
         moviesGridPane.add(addMovieButton, 0, 3, 1, 1);
         moviesGridPane.add(deleteMovieButton, 0, 4, 1, 1);
-        moviesGridPane.add(updateMovieButton, 0, 5, 1, 1);
-        moviesGridPane.add(createMovieButton,0,6,1,1);
+        moviesGridPane.add(updateMovieButton, 1, 3, 1, 1);
+        moviesGridPane.add(createMovieButton,1,4,1,1);
+
         moviesGridPane.add(actorFirstNameLabel,2,3,1,1);
         moviesGridPane.add(actorFirstNameTextField,3,3,1,1);
         moviesGridPane.add(actorLastNameLabel,2,4,1,1);
         moviesGridPane.add(actorLastNameTextField,3,4,1,1);
         moviesGridPane.add(addActorButton,3,5,1,1);
 
+        searchGridPane = new GridPane();
+        searchGridPane.setVgap(10);
+        searchGridPane.setHgap(10);
+
+        searchGridPane.add(searchTitleTextField,0,0,1,1);
+        searchGridPane.add(searchActorTextField,0,1,1,1);
+        searchGridPane.add(searchCategoryLabel,1,0,1,1);
+        searchGridPane.add(searchCategoryChoiceBox,2,0,1,1);
+        searchGridPane.add(searchRatingLabel, 1,1,1,1);
+        searchGridPane.add(searchRatingChoiceBox, 2,1,1,1);
+        searchGridPane.add(updateListButton,3,0,1,1);
+        searchGridPane.add(clearSearchButton,3,1,1,1);
+
         searchHBox = new HBox();
         searchHBox.setAlignment(Pos.CENTER);
         searchHBox.setPadding(new Insets(10, 10, 10, 10));
         searchHBox.setSpacing(10);
-        searchHBox.getChildren().addAll(listByActorButton, searchTextFieldTitle,  ratingChoiceBox, categoryChoiceBox);
+        searchHBox.getChildren().addAll(searchGridPane);
 
         centerVBox = new VBox();
         centerVBox.setAlignment(Pos.TOP_CENTER);
@@ -226,17 +239,17 @@ public class MoviesGui {
         return centerVBox;
     }
 
-    public void moviesButtonsAndEvents() {
-        //BUTTONS
+    public void buttonsAndEvents() {
         handleAddMovieButton();
         handleUpdateMovieButton();
         handleDeleteMovieButton();
+        handleCreateMovieButton();
         handleAddActorButton();
-        handleListByActorButton();
-
-        //EVENTS
+        handleClearSearchButton();
+        handleUpdateListButton();
         handleFilmTable();
-        filterFilmTableTitleCategoryRating();
+        filterFilms();
+
     }
 
     private void setupFilmTable() {
@@ -278,66 +291,125 @@ public class MoviesGui {
         filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
+    private void handleCreateMovieButton() {
+        createMovieButton.setOnMouseClicked(event-> {
+            titleTextField.clear();
+            specialFeaturesTextField.clear();
+            releaseYearTextField.clear();
+            lengthTextField.clear();
+            descriptionTextArea.clear();
+            actorsListView.getItems().clear();
+            categoryChoiceBox2.getSelectionModel().clearSelection();
+            languageChoiceBox.getSelectionModel().clearSelection();
+            ratingChoiceBox2.getSelectionModel().clearSelection();
+            filmTable.getSelectionModel().clearSelection();
+        });
+    }
+
     private void handleAddMovieButton() {
         //TODO KAN DENNA LÖSAS SNYGGARE/BÄTTRE????? ANTAGLIGEN MEN HUR
         addMovieButton.setOnMouseClicked(event-> {
+            if(!allFilledOut()) {
+                return;
+            }
             String selectedTitle = titleTextField.getText();
             String selectedDescription = descriptionTextArea.getText();
             int selectedReleaseYear = Integer.parseInt(releaseYearTextField.getText());
-            String languageString = languageChoiceBox.getValue();
-            String categoryString = categoryChoiceBox2.getValue();
-
-            Category selectedCategory = null;
-            Language selectedLanguage = null;
+            int selectedLength = TimeUtil.formatHourMinutesToMinutes(lengthTextField.getText());
+            Category selectedCategory = categoryChoiceBox2.getValue();
+            Language selectedLanguage = languageChoiceBox.getValue();
             Rating selectedRating = ratingChoiceBox2.getValue();
-            System.out.println(ratingChoiceBox2.getValue().getRating());
-
-            System.out.println(actorsListView.getItems());
 
             double defaultRentalRate = 4.99;
             double defaultReplacementCost = 19.99;
-            for(Category category : categoryObservableList) {
-                if(category.getName().equals(categoryString)) {
-                    selectedCategory = category;
-                    break;
-                }
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Lägg till film");
+            alert.setHeaderText("Lägga till");
+            alert.setContentText("Vill du lägga till " + selectedTitle + " i databasen?");
+
+            ButtonType yesButton = new ButtonType("Ja");
+            ButtonType noButton = new ButtonType("Nej");
+
+            alert.getButtonTypes().setAll(yesButton, noButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == yesButton) {
+                Film film = new Film();
+                film.setTitle(selectedTitle);
+                film.setDescription(selectedDescription);
+                film.setReleaseYear(selectedReleaseYear);
+                film.setLanguage(selectedLanguage);
+                film.setLength(selectedLength);
+                film.setRentalRate(BigDecimal.valueOf(defaultRentalRate));
+                film.setReplacementCost(BigDecimal.valueOf(defaultReplacementCost));
+                film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+                film.setRating(selectedRating);
+                film.setCategory(selectedCategory);
+                film.setSpecialFeatures(specialFeaturesTextField.getText());
+                film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+                //TODO HURFAN FÅR MAN TILL MED SETACTORS?
+                controller.addFilmToDatabase(film);
             }
-
-            for(Language language : languageObservableList) {
-                if(language.getName().equals(languageString)) {
-                    selectedLanguage = language;
-                    break;
-                }
-            }
-
-            Film film = new Film();
-            film.setTitle(selectedTitle);
-            film.setDescription(selectedDescription);
-            film.setReleaseYear(selectedReleaseYear);
-            film.setLanguage(selectedLanguage);
-            film.setRentalRate(BigDecimal.valueOf(defaultRentalRate));
-            film.setReplacementCost(BigDecimal.valueOf(defaultReplacementCost));
-            film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-            film.setRating(selectedRating);
-            film.setCategory(selectedCategory);
-            film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-            //TODO HURFAN FÅR MAN TILL MED SETACTORS?
-            controller.getFilmDAO().create(film);
-
-            updateFilmTable();
-            filterFilmTableTitleCategoryRating();
         });
     }
 
     private void handleUpdateMovieButton() {
         updateMovieButton.setOnMouseClicked(event-> {
-            //TODO Fixa detta
+            if (!isFilmSelected()) {
+                return;
+            }
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setHeaderText("Uppdatera");
+            alert.setContentText("Är du säker på att du vill uppdatera vald film?");
+
+            ButtonType yesButton = new ButtonType("Ja");
+            ButtonType noButton = new ButtonType("Nej");
+
+            alert.getButtonTypes().setAll(yesButton, noButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == yesButton) {
+                Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
+                String selectedTitle = titleTextField.getText();
+                String selectedDescription = descriptionTextArea.getText();
+                int selectedReleaseYear = Integer.parseInt(releaseYearTextField.getText());
+                int selectedLength = TimeUtil.formatHourMinutesToMinutes(lengthTextField.getText());
+                Category selectedCategory = categoryChoiceBox2.getValue();
+                Language selectedLanguage = languageChoiceBox.getValue();
+                Rating selectedRating = ratingChoiceBox2.getValue();
+                selectedFilm.setTitle(selectedTitle);
+                selectedFilm.setDescription(selectedDescription);
+                selectedFilm.setReleaseYear(selectedReleaseYear);
+                selectedFilm.setLanguage(selectedLanguage);
+                selectedFilm.setLength(selectedLength);
+                selectedFilm.setRating(selectedRating);
+                selectedFilm.setCategory(selectedCategory);
+                selectedFilm.setSpecialFeatures(specialFeaturesTextField.getText());
+                selectedFilm.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+                controller.updateSelectedFilm(selectedFilm);
+            }
         });
     }
 
     private void handleDeleteMovieButton() {
         deleteMovieButton.setOnMouseClicked(event-> {
-            //TODO fixa detta
+            if (!isFilmSelected()) {
+                return;
+            }
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Radera");
+            alert.setHeaderText("Uppdatera");
+            alert.setContentText("Är du säker på att du vill RADERA vald film?");
+
+            ButtonType yesButton = new ButtonType("Ja");
+            ButtonType noButton = new ButtonType("Nej");
+
+            alert.getButtonTypes().setAll(yesButton, noButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == yesButton) {
+                Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
+                controller.deleteSelectedFilm(selectedFilm);
+            }
         });
     }
 
@@ -366,23 +438,58 @@ public class MoviesGui {
         });
     }
 
-    private void handleListByActorButton() {
-        listByActorButton.setOnMouseClicked(event -> {
-            filmTable.setItems(filmObservableList);
-            Optional<String> searchInput = actorSearchTextInputDialog.showAndWait();
-            searchInput.ifPresent(name -> {
-                filteredList = new FilteredList<>(filmObservableList, film -> {
-                    boolean actorMatch = false;
-                    for (Actor actor : film.getActors()) {
-                        if (actor.getFirstName().toLowerCase().contains(name.toLowerCase()) || actor.getLastName().toLowerCase().contains(name.toLowerCase()) ) {
-                            actorMatch = true;
-                            break;
-                        }
+    private void handleClearSearchButton() {
+        clearSearchButton.setOnMouseClicked(event-> {
+            searchRatingChoiceBox.getSelectionModel().clearSelection();
+            searchCategoryChoiceBox.getSelectionModel().clearSelection();
+            searchActorTextField.clear();
+            searchTitleTextField.clear();
+        });
+    }
+
+    private void handleUpdateListButton() {
+        updateListButton.setOnMouseClicked(event-> {
+            controller.updateFilmList();
+            updateFilmTable();
+        });
+    }
+
+    private void filterFilms() {
+        String searchName = searchActorTextField.getText().toLowerCase();
+        String searchTitle = searchTitleTextField.getText().toLowerCase();
+        Category searchCategory = searchCategoryChoiceBox.getValue();
+        Rating searchRating = searchRatingChoiceBox.getValue();
+
+        filteredList.setPredicate(film -> {
+            if (!searchName.isEmpty()) {
+                boolean actorMatch = false;
+                for (Actor actor : film.getActors()) {
+                    String fullName = actor.getFirstName().toLowerCase() + " " + actor.getLastName().toLowerCase();
+                    if (fullName.contains(searchName)) {
+                        actorMatch = true;
+                        break;
                     }
-                    return actorMatch;
-                });
-                filmTable.setItems(filteredList);
-            });
+                }
+                if (!actorMatch) {
+                    return false;
+                }
+            }
+
+            if (!searchTitle.isEmpty() && !film.getTitle().toLowerCase().contains(searchTitle)) {
+                return false;
+            }
+
+
+            if (searchCategory != null && !film.getCategory().getName().equals(searchCategory.toString())) {
+                return false;
+            }
+
+
+            if (searchRating != null && !film.getRating().getRating().equals(searchRating.toString())) {
+                return false;
+            }
+
+            return true;
         });
     }
 
@@ -399,9 +506,8 @@ public class MoviesGui {
                 titleTextField.setText(selectedFilm.getTitle());
                 releaseYearTextField.setText(String.valueOf(selectedFilm.getReleaseYear()));
                 lengthTextField.setText(TimeUtil.formatTimeMinutesToHourMinutes(selectedFilm.getLength()));
-                categoryChoiceBox2.setValue(selectedFilm.getCategory().getName());
+                setCategoryAndLanguageValues(selectedFilm);
                 ratingChoiceBox2.setValue(selectedFilm.getRating());
-                languageChoiceBox.setValue(selectedFilm.getLanguage().getName());
                 specialFeaturesTextField.setText(selectedFilm.getSpecialFeatures());
                 descriptionTextArea.setText(selectedFilm.getDescription());
                 actorsListView.getItems().clear();
@@ -412,51 +518,65 @@ public class MoviesGui {
         });
     }
 
-    private void filterFilmTableTitleCategoryRating() {
-        filteredList = new FilteredList<>(filmObservableList, p -> true);
-        searchTextFieldTitle.setPromptText("Sök efter titel...");
-        searchTextFieldTitle.setOnKeyReleased(keyEvent -> {
-            String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-            String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
-            Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
-            filteredList.setPredicate(film -> {
-                boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
-                boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch && categoryMatch && ratingMatch;
-            });
-        });
-
-        categoryChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-            String searchCategory = newValue.toLowerCase();
-            Rating searchRating = ratingChoiceBox.getSelectionModel().getSelectedItem();
-            filteredList.setPredicate(film -> {
-                boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
-                boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch && categoryMatch && ratingMatch;
-            });
-        });
-
-        ratingChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            String searchTitle = searchTextFieldTitle.getText().toLowerCase();
-            String searchCategory = categoryChoiceBox.getSelectionModel().getSelectedItem().toLowerCase();
-            Rating searchRating = newValue;
-            filteredList.setPredicate(film -> {
-                boolean titleMatch = film.getTitle().toLowerCase().startsWith(searchTitle);
-                boolean categoryMatch = searchCategory.isEmpty() || searchCategory.equalsIgnoreCase("alla kategorier") || (film.getCategory() != null && film.getCategory().getName().toLowerCase().contains(searchCategory.toLowerCase()));
-                boolean ratingMatch = searchRating.equals(Rating.ALL) || film.getRating().equals(searchRating);
-                return titleMatch && categoryMatch && ratingMatch;
-            });
-        });
-
-        filmTable.setItems(filteredList);
+    private void updateFilmTable() {
+        filmObservableList = controller.getFilmObservableList();
+        filmTable.setItems(filmObservableList);
     }
 
-    private void updateFilmTable() {
-        filmObservableList = FXCollections.observableList(controller.getFilmDAO().getAll());
-        filmTable.setItems(filmObservableList);
+    private void updateFilteredList(String searchName, String searchTitle, Category searchCategory, Rating searchRating) {
+        filteredList.setPredicate(film -> {
+            if (!searchName.isEmpty()) {
+                boolean actorMatch = false;
+                for (Actor actor : film.getActors()) {
+                    String fullName = actor.getFirstName().toLowerCase() + " " + actor.getLastName().toLowerCase();
+                    if (fullName.contains(searchName)) {
+                        actorMatch = true;
+                        break;
+                    }
+                }
+                if (!actorMatch) {
+                    return false;
+                }
+            }
+
+            if (!searchTitle.isEmpty() && !film.getTitle().toLowerCase().contains(searchTitle)) {
+                return false;
+            }
+
+            if (searchCategory != null && !film.getCategory().getName().equals(searchCategory.toString())) {
+                return false;
+            }
+
+            if (searchRating != null && !film.getRating().getRating().equals(searchRating.toString())) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    private void setCategoryAndLanguageValues(Film selectedFilm) {
+        if (selectedFilm != null) {
+            Category selectedCategory = selectedFilm.getCategory();
+            if (selectedCategory != null) {
+                for (Category category : categoryChoiceBox2.getItems()) {
+                    if (category.getName().equals(selectedCategory.getName())) {
+                        categoryChoiceBox2.setValue(category);
+                        break;
+                    }
+                }
+            }
+
+            Language selectedLanguage = selectedFilm.getLanguage();
+            if (selectedLanguage != null) {
+                for (Language language : languageChoiceBox.getItems()) {
+                    if (language.getName().equals(selectedLanguage.getName())) {
+                        languageChoiceBox.setValue(language);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private TableCell<Film, Integer> formatTimeInTableViewCell() {
@@ -473,5 +593,94 @@ public class MoviesGui {
             }
         };
     }
-}
 
+    private boolean isFilmSelected() {
+        if (filmTable.getSelectionModel().getSelectedItem() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Välj film i listan");
+            alert.setHeaderText("Välj film i listan");
+            alert.setContentText("Du måste välja en film i listan");
+            alert.show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean allFilledOut() {
+        if(titleTextField.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste fylla i titel");
+            alert.setContentText("Ange en titel");
+            alert.show();
+            return false;
+        }
+        if(releaseYearTextField.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste fylla i utgivningsår");
+            alert.setContentText("Du måste fylla i utgivningsår");
+            alert.show();
+            return false;
+        }
+        if(lengthTextField.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste fylla i längd");
+            alert.setContentText("Du måste fylla i längd");
+            alert.show();
+            return false;
+        }
+        if(categoryChoiceBox2.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste välja kategori");
+            alert.setContentText("Du måste välja kategori");
+            alert.show();
+            return false;
+        }
+        if(languageChoiceBox.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste välja språk");
+            alert.setContentText("Du måste välja språk");
+            alert.show();
+            return false;
+        }
+        if(ratingChoiceBox2.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste välja åldersgräns");
+            alert.setContentText("Du måste välja åldersgräns");
+            alert.show();
+            return false;
+        }
+        if(specialFeaturesTextField.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste fylla i specialeffekter");
+            alert.setContentText("Du måste fylla i specialeffekter");
+            alert.show();
+            return false;
+        }
+        if(descriptionTextArea.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste fylla i beskrivning");
+            alert.setContentText("Du måste fylla i beskrivning");
+            alert.show();
+            return false;
+        }
+       /* if(actorsListView.getItems()==null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Du måste fylla i all information");
+            alert.setHeaderText("Du måste lägga till skådespelare");
+            alert.setContentText("Du måste lägga till skådespelare");
+            alert.show();
+            return false;
+        }*/
+
+        return true;
+
+    }
+}

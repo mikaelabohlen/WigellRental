@@ -1,8 +1,6 @@
 package org.example.gui;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,15 +10,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Controller;
-import org.example.dao.FilmDAO;
-import org.example.entities.*;
-import org.example.enums.Rating;
-import org.example.utils.TimeUtil;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainGui {
 
@@ -35,6 +26,7 @@ public class MainGui {
     private Left left;
     private CustomersGui customersGui;
     private MoviesGui moviesGui;
+    private RentGui rentGui;
 
 
     public MainGui(Stage primaryStage, Controller controller) {
@@ -123,6 +115,7 @@ public class MainGui {
         left = new Left();
         customersGui = new CustomersGui(controller);
         moviesGui = new MoviesGui(controller);
+        rentGui = new RentGui(controller);
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
@@ -137,6 +130,7 @@ public class MainGui {
         primaryStage.setMaximized(true);
         primaryStage.setTitle("WigellsRental");
         primaryStage.setScene(mainScene);
+        primaryStage.setOnCloseRequest(event-> {System.exit(0);});
         primaryStage.show();
     }
 
@@ -150,7 +144,6 @@ public class MainGui {
         handleReturnButton();
         handleStaffButton();
         handleCustomerButton();
-
     }
 
     private void handleCustomerButton() {
@@ -178,8 +171,10 @@ public class MainGui {
 
     private void handleRentButton() {
         left.rentButton.setOnMouseClicked(event -> {
+            mainPane.setCenter(null);
             enableNavButtons();
             left.rentButton.setDisable(true);
+            mainPane.setCenter(rentGui.setViewToRent());
         });
     }
 
@@ -228,9 +223,11 @@ public class MainGui {
     }
 
     private void initiate() {
-        moviesGui.setupMovies();
-        customersGui.setupCustomers();
-        moviesGui.moviesButtonsAndEvents();
-        customersGui.customerButtonsAndEvents();
+        moviesGui.setup();
+        moviesGui.buttonsAndEvents();
+        customersGui.setup();
+        customersGui.buttonsAndEvents();
+        rentGui.setup();
+        rentGui.buttonsAndEvents();
     }
 }

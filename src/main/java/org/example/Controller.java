@@ -1,18 +1,11 @@
 package org.example;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.dao.*;
 
 import org.example.entities.*;
 
-import org.example.enums.Rating;
-
-import java.math.BigDecimal;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +25,14 @@ public class Controller {
 
     private Store activeStore;
 
+    private List<Film> filmsInStore1;
+    private List<Film> filmsInStore2;
+
+    private ObservableList<Film> filmObservableList;
+    private ObservableList<Language> languageObservableList;
+    private ObservableList<Category> categoryObservableList;
+    private ObservableList<Customer> customerObservableList;
+
     public Controller(ActorDAO actorDAO, AddressDAO addressDAO, CategoryDAO categoryDAO, CityDAO cityDAO, CustomerDAO customerDAO, FilmDAO filmDAO, InventoryDAO inventoryDAO, LanguageDAO languageDAO, PaymentDAO paymentDAO, RentalDAO rentalDAO, StaffDAO staffDAO, StoreDAO storeDAO) {
         this.actorDAO = actorDAO;
         this.addressDAO = addressDAO;
@@ -45,6 +46,15 @@ public class Controller {
         this.staffDAO = staffDAO;
         this.storeDAO = storeDAO;
         this.categoryDAO = categoryDAO;
+
+
+        filmObservableList = FXCollections.observableList(filmDAO.getAll());
+        languageObservableList = FXCollections.observableList(languageDAO.getAll());
+        categoryObservableList = FXCollections.observableList(categoryDAO.getAll());
+        customerObservableList = FXCollections.observableList(customerDAO.getAll());
+        filmsInStore1 = filmDAO.getAllFilmsByStore(storeDAO.read(1));
+        filmsInStore2 = filmDAO.getAllFilmsByStore(storeDAO.read(2));
+
     }
 
     public ActorDAO getActorDAO() {
@@ -147,8 +157,31 @@ public class Controller {
         return filmDAO.getAll();
     }
 
+    public ObservableList<Film> getFilmObservableList() {
+        return filmObservableList;
+    }
 
-    public Inventory canFilmBeRented(Film selectedFilm, int storeId) {
+    public ObservableList<Language> getLanguageObservableList() {
+        return languageObservableList;
+    }
+
+    public ObservableList<Category> getCategoryObservableList() {
+        return categoryObservableList;
+    }
+
+    public ObservableList<Customer> getCustomerObservableList() {
+        return customerObservableList;
+    }
+
+    public List<Film> getFilmsInStore1() {
+        return filmsInStore1;
+    }
+
+    public List<Film> getFilmsInStore2() {
+        return filmsInStore2;
+    }
+
+    /*    public Inventory canFilmBeRented(Film selectedFilm, int storeId) {
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
         for (Inventory inventoryItem : inventories) {
             System.out.println("InventoryId: "+inventoryItem.getInventoryId()+ "\n\n\n\n\n\n\n");
@@ -211,11 +244,12 @@ public class Controller {
             actor.addOneMovie(film);
             actorDAO.update(actor);
         }
-    }
+    }*/
 
     public List<Actor> getActors(Film selectedFilm) {
         return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
     }
+
 
 
     public void updateCustomer(Customer customer) {
@@ -245,6 +279,28 @@ public class Controller {
         getAddressDAO().create(customer.getAddress());
         customer.setStore(activeStore);
         getCustomerDAO().create(customer);
+    }
+
+    public void deleteSelectedFilm(Film selectedItem) {
+        //TODO funkar inte pga fk constraints
+        filmDAO.delete(selectedItem.getFilmId());
+    }
+
+    public void updateSelectedFilm(Film selectedItem) {
+        getFilmDAO().update(selectedItem);
+    }
+
+    public void updateFilmList() {
+        filmObservableList = FXCollections.observableList(filmDAO.getAll());
+    }
+
+    public void addFilmToDatabase(Film film) {
+
+        filmDAO.create(film);
+    }
+
+    public void updateCustomerList() {
+        customerObservableList = FXCollections.observableList(customerDAO.getAll());
     }
 
 //    public void rentFilm() {

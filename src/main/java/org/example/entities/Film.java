@@ -205,7 +205,6 @@ public class Film {
         this.inventories = inventories;
     }
 
-
     public Integer getTotalStock(int storeId){
         int totalStock = 0;
 
