@@ -9,14 +9,21 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import org.example.Controller;
 import org.example.dao.FilmDAO;
-import org.example.entities.Film;
-import org.example.entities.Store;
+import org.example.dao.InventoryDAO;
+import org.example.entities.*;
+import org.hibernate.type.LocalDateTimeType;
+import org.hibernate.type.LocalTimeType;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class RentGui {
     private Controller controller;
@@ -50,10 +57,9 @@ public class RentGui {
 
     public void updateFilmTableForStore(Store store) {
         List<Film> filmsInStore;
-        if(store.getStoreId()==1){
+        if (store.getStoreId() == 1) {
             filmsInStore = controller.getFilmsInStore1();
-        }
-        else {
+        } else {
             filmsInStore = controller.getFilmsInStore2();
         }
         ObservableList<Film> filmTableData = FXCollections.observableArrayList(filmsInStore);
@@ -67,6 +73,7 @@ public class RentGui {
     }
 
     public void buttonsAndEvents() {
+        handleFilmTable();
     }
 
     private void setupFilmTable() {
@@ -100,4 +107,24 @@ public class RentGui {
         filmTable.setMaxWidth(800);
         filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
+
+    private void handleFilmTable() {
+    filmTable.setOnMouseClicked(event ->
+    {
+        if (event.getClickCount() == 2) {
+            Film selectedFilm =  filmTable.getSelectionModel().getSelectedItem();
+            if (selectedFilm != null) {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Hyra ut ");
+                dialog.setHeaderText("Hyra ut " + selectedFilm.getTitle());
+                dialog.setContentText("Ange kundens ID:");
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(customerId -> {
+                    controller.rentFilm(customerId, selectedFilm);
+                });
+            }
+        }
+    });
+}
+
 }

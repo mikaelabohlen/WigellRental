@@ -6,6 +6,9 @@ import org.example.dao.*;
 
 import org.example.entities.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +55,8 @@ public class Controller {
         languageObservableList = FXCollections.observableList(languageDAO.getAll());
         categoryObservableList = FXCollections.observableList(categoryDAO.getAll());
         customerObservableList = FXCollections.observableList(customerDAO.getAll());
-        filmsInStore1 = filmDAO.getAllFilmsByStore(storeDAO.read(1));
-        filmsInStore2 = filmDAO.getAllFilmsByStore(storeDAO.read(2));
+
+
 
     }
 
@@ -174,10 +177,16 @@ public class Controller {
     }
 
     public List<Film> getFilmsInStore1() {
+        if(filmsInStore1==null) {
+            filmsInStore1 = filmDAO.getAllFilmsByStore(storeDAO.read(1));
+        }
         return filmsInStore1;
     }
 
     public List<Film> getFilmsInStore2() {
+        if(filmsInStore2==null){
+            filmsInStore2 = filmDAO.getAllFilmsByStore(storeDAO.read(2));
+        }
         return filmsInStore2;
     }
 
@@ -290,17 +299,45 @@ public class Controller {
         getFilmDAO().update(selectedItem);
     }
 
-    public void updateFilmList() {
-        filmObservableList = FXCollections.observableList(filmDAO.getAll());
-    }
-
     public void addFilmToDatabase(Film film) {
 
         filmDAO.create(film);
     }
 
+    public void updateFilmList() {
+        filmObservableList = FXCollections.observableList(filmDAO.getAll());
+    }
+
     public void updateCustomerList() {
         customerObservableList = FXCollections.observableList(customerDAO.getAll());
+    }
+
+    public void rentFilm(String customerId, Film selectedFilm) {
+        //TODO denna är antagligen felande det läggs in i tabellen men kommer inte fram med getRentalsMetoden sen
+
+        LocalDate date = LocalDate.now();
+
+        Rental rental = new Rental();
+        rental.setRentalDate(date.atStartOfDay());
+        rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        rental.setStaff(getStaffDAO().read(getActiveStore().getStoreId()));
+
+        Customer customer = getCustomerDAO().read(Integer.parseInt(customerId));
+        rental.setCustomer(customer);
+
+        Inventory inventory = new Inventory();
+        inventory.setFilm(selectedFilm);
+        inventory.setStore(activeStore);
+        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        inventoryDAO.create(inventory);
+
+        rental.setInventory(inventory);
+        rentalDAO.create(rental);
+
+    }
+
+    public List<Film> getRentals(int customerId) {
+        return filmDAO.getCurrentlyRentedFilmsForCustomer(customerId);
     }
 
 //    public void rentFilm() {
