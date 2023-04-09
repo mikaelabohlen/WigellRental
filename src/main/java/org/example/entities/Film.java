@@ -72,7 +72,7 @@ public class Film {
 //    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
 //    private List<Inventory> inventories;
 
-    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)//TODO ändra till eager?
+    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)//TODO ändra till eager?
     private Set<Inventory> inventories;
 
 

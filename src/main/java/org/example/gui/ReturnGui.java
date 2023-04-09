@@ -1,52 +1,58 @@
 package org.example.gui;
 
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import org.example.Controller;
-import org.example.entities.Customer;
 import org.example.entities.Film;
 import org.example.entities.Inventory;
 import org.example.entities.Rental;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class ReturnGui {
     private Controller controller;
 
-    private TableView<Film> filmTable;
-    private TableColumn<Film, Integer> idColumn;
-    private TableColumn<Film, String> titleColumn;
-    private TableColumn<Film, LocalDateTime> rentalDateColumn;
-    private TableColumn<Film, LocalDateTime> rentalReturnColumn;
+    private TableView<Rental> rentalTable;
+    private TableColumn<Rental, Integer> idColumn;
+    private TableColumn<Rental, String> titleColumn;
+    private TableColumn<Rental, LocalDateTime> returnDateColumn, rentDateColumn;
 
-    private ObservableList<Film> customerFilmList;
+    private Button rentedButton, showAllButton, newCustomerButton;
+    private Label customerLabel;
     private ObservableList<Rental> customerRentals;
 
     private VBox centerVBox;
+    private HBox buttonHbox;
 
-    private int currentCustomerId;
     public ReturnGui(Controller controller) {
         this.controller = controller;
     }
 
     public void setup() {
-        setupFilmTable();
+        customerLabel = new Label("Kundnummer: ");
+
+        rentedButton = new Button("Visa Uthyrda");
+        showAllButton = new Button("Visa Alla");
+        newCustomerButton = new Button("Byt kund");
+
+        setupRentalsTable();
+
+        buttonHbox = new HBox();
+        buttonHbox.setAlignment(Pos.CENTER);
+        buttonHbox.setPadding(new Insets(10, 10, 10, 10));
+        buttonHbox.setSpacing(10);
+        buttonHbox.getChildren().addAll(customerLabel, newCustomerButton, rentedButton, showAllButton);
 
         centerVBox = new VBox();
         centerVBox.setAlignment(Pos.TOP_CENTER);
@@ -56,7 +62,7 @@ public class ReturnGui {
 
     public Node setViewToReturn() {
         centerVBox.getChildren().clear();
-        centerVBox.getChildren().addAll(filmTable);
+        centerVBox.getChildren().addAll(buttonHbox,rentalTable);
         enterCustomerId();
         return centerVBox;
     }
@@ -67,87 +73,88 @@ public class ReturnGui {
         dialog.setContentText("Ange kundens ID:");
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(customerId -> {
-            customerFilmList = FXCollections.observableArrayList(controller.getRentals(Integer.parseInt(customerId)));
-            currentCustomerId = Integer.parseInt(customerId);
-            filmTable.getItems().clear();
-            filmTable.getItems().addAll(customerFilmList);
+            customerRentals = FXCollections.observableArrayList(controller.getRentals(Integer.parseInt(customerId)));
+            if(!customerRentals.isEmpty()) {
+                rentalTable.getItems().clear();
+            }
+            rentalTable.getItems().addAll(customerRentals);
+            customerLabel.setText("Kundnummer: " + customerId);
         });
     }
 
     public void buttonAndEvents() {
-        handleFilmTable();
+        handleRentalTable();
+        handleSortedButton();
+        handleShowAllButton();
+        handleNewCustomerButton();
     }
 
-
-    private void setupFilmTable() {
-        filmTable = new TableView<Film>();
-
-        idColumn = new TableColumn<Film, Integer>("Id:");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("filmId"));
-
-        titleColumn = new TableColumn<Film, String>("Titel:");
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        rentalDateColumn = new TableColumn<Film, LocalDateTime>("Uthyrningsdatum:");
-        rentalDateColumn.setCellValueFactory(c -> {
-            List<Inventory> inventories = new ArrayList<>(c.getValue().getInventories());
-            for (Inventory inventory : inventories) {
-                List<Rental> rentals = new ArrayList<>(inventory.getRentals());
-                for (Rental rental : rentals) {
-                    if (rental != null) {
-                        return new SimpleObjectProperty<>(rental.getRentalDate());
-                    }
-                }
+    private void handleSortedButton() {
+        rentedButton.setOnMouseClicked(event -> {
+            if(customerRentals!=null) {
+                ObservableList<Rental>sortedList = customerRentals.filtered(rental -> rental.getReturnDate() == null);
+                rentalTable.setItems(sortedList);
+                rentalTable.refresh();
             }
-            return null;
         });
-
-        rentalReturnColumn = new TableColumn<Film, LocalDateTime>("Returdatum:");
-        rentalReturnColumn.setCellValueFactory(c -> {
-            List<Inventory> inventories = new ArrayList<>(c.getValue().getInventories());
-            for (Inventory inventory : inventories) {
-                List<Rental> rentals = new ArrayList<>(inventory.getRentals());
-                for (Rental rental : rentals) {
-                    if (rental != null && rental.getReturnDate() != null && rental.getCustomer().getCustomerId() == currentCustomerId) {
-                        return new SimpleObjectProperty<>(rental.getReturnDate());
-                    }
-                }
-            }
-            return null;
-        });
-
-        filmTable.getColumns().add(idColumn);
-        filmTable.getColumns().add(titleColumn);
-        filmTable.getColumns().add(rentalDateColumn);
-        filmTable.getColumns().add(rentalReturnColumn);
-
-        filmTable.setFocusTraversable(false);
-        filmTable.setMaxWidth(800);
-        filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
-    private void handleFilmTable() {
-        //TODO funkar inte än...
-        filmTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
-                Customer customer = controller.getCustomerDAO().read(currentCustomerId);
-                if (selectedFilm != null) {
-                    Rental rental = null;
-                    for (Inventory inventory : selectedFilm.getInventories()) {
-                        for (Rental r : inventory.getRentals()) {
-                            if (r.getCustomer().equals(customer) && r.getReturnDate() == null) {
-                                rental = r;
-                                break;
-                            }
-                        }
-                        if (rental != null) {
-                            rental.setReturnDate(LocalDateTime.now());
-                            System.out.println(rental.getReturnDate());
-                            controller.getRentalDAO().update(rental);
-                            filmTable.refresh();
-                            break;
-                        }
-                    }
+
+    private void handleShowAllButton() {
+        showAllButton.setOnMouseClicked(event-> {
+            rentalTable.setItems(customerRentals);
+        });
+    }
+
+    private void handleNewCustomerButton() {
+        newCustomerButton.setOnMouseClicked(event-> {
+            rentalTable.setItems(customerRentals);
+            enterCustomerId();
+        });
+    }
+    private void setupRentalsTable() {
+        rentalTable = new TableView<>();
+        idColumn = new TableColumn<>("Uthyrnings-ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("rentalId"));
+
+        titleColumn = new TableColumn<>("Filmtitel");
+        titleColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Rental, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<Rental, String> c) {
+                Inventory inventory = c.getValue().getInventory();
+                Film film = inventory.getFilm();
+                return new SimpleStringProperty(film.getTitle());
+            }
+        });
+
+
+        rentDateColumn = new TableColumn<>("Uthyrningsdatum");
+        rentDateColumn.setCellValueFactory(new PropertyValueFactory<>("rentalDate"));
+
+        returnDateColumn = new TableColumn<>("Återlämningsdatum");
+        returnDateColumn.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
+
+        rentalTable.getColumns().add(idColumn);
+        rentalTable.getColumns().add(titleColumn);
+        rentalTable.getColumns().add(rentDateColumn);
+        rentalTable.getColumns().add(returnDateColumn);
+
+        rentalTable.setFocusTraversable(false);
+        rentalTable.setMaxWidth(800);
+        rentalTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    private void handleRentalTable() {
+        rentalTable.setOnMouseClicked(event-> {
+            if(event.getClickCount()==2) {
+                Rental selectedRental = rentalTable.getSelectionModel().getSelectedItem();
+                if(selectedRental != null && selectedRental.getReturnDate() == null) {
+                    controller.returnFilm(selectedRental);
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Återlämnad");
+                    alert.setHeaderText(rentalTable.getSelectionModel().getSelectedItem().getInventory().getFilm().getTitle());
+                    alert.setContentText("Återlämnad");
+                    alert.show();
+                    rentalTable.refresh();
                 }
             }
         });
