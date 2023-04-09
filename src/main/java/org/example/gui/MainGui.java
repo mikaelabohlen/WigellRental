@@ -28,6 +28,7 @@ public class MainGui {
     private MoviesGui moviesGui;
     private RentGui rentGui;
     private ReturnGui returnGui;
+    private StaffGui staffGui;
 
 
     public MainGui(Stage primaryStage, Controller controller) {
@@ -118,6 +119,7 @@ public class MainGui {
         moviesGui = new MoviesGui(controller);
         rentGui = new RentGui(controller);
         returnGui = new ReturnGui(controller);
+        staffGui = new StaffGui(controller);
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
@@ -159,8 +161,10 @@ public class MainGui {
 
     private void handleStaffButton() {
         left.staffButton.setOnMouseClicked(event -> {
+            mainPane.setCenter(null);
             enableNavButtons();
             left.staffButton.setDisable(true);
+            mainPane.setCenter(staffGui.setViewToStaff());
         });
     }
 
@@ -208,7 +212,6 @@ public class MainGui {
     }
 
     private void handleChoseStoreSubmitButton() {
-        //TODO CHANGE SUBMIT BUTTON TO CHOICEBOX EVENTHANDLER
         top.choseStoreSubmitButton.setOnMouseClicked(event -> {
             if (top.choseStoreChoiceBox.getValue() == null) {
                 return;
@@ -235,5 +238,7 @@ public class MainGui {
         rentGui.buttonsAndEvents();
         returnGui.setup();
         returnGui.buttonAndEvents();
+        staffGui.setup();
+        staffGui.buttonAndEvents();
     }
 }

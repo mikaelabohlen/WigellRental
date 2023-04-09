@@ -13,15 +13,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import org.example.Controller;
-import org.example.dao.FilmDAO;
-import org.example.dao.InventoryDAO;
 import org.example.entities.*;
-import org.hibernate.type.LocalDateTimeType;
-import org.hibernate.type.LocalTimeType;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,15 +29,11 @@ public class RentGui {
 
     private VBox centerVBox;
 
-    private ObservableList<Film> rentObservableList;
-
     public RentGui(Controller controller) {
         this.controller = controller;
     }
 
     public void setup() {
-
-        rentObservableList = controller.getFilmObservableList();
 
         setupFilmTable();
         updateFilmTableForStore(controller.getActiveStore());
@@ -101,7 +90,7 @@ public class RentGui {
         filmTable.getColumns().add(titleColumn);
         filmTable.getColumns().add(inStockColumn);
         filmTable.getColumns().add(totalStockColumn);
-        filmTable.getItems().addAll(rentObservableList);
+        //filmTable.getItems().addAll(rentObservableList);
 
         filmTable.setFocusTraversable(false);
         filmTable.setMaxWidth(800);

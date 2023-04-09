@@ -54,6 +54,7 @@ public class MoviesGui {
     public MoviesGui(Controller controller) {
         this.controller = controller;
     }
+
     public void setup() {
         titleLabel = new Label("Titel:");
         descriptionLabel = new Label("Beskrivning:");
@@ -291,6 +292,8 @@ public class MoviesGui {
         filmTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
+
+    //BUTTONS METHODS
     private void handleCreateMovieButton() {
         createMovieButton.setOnMouseClicked(event-> {
             titleTextField.clear();
@@ -347,7 +350,7 @@ public class MoviesGui {
                 film.setSpecialFeatures(specialFeaturesTextField.getText());
                 film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
                 //TODO HURFAN FÅR MAN TILL MED SETACTORS?
-                controller.addFilmToDatabase(film);
+                controller.createNewFilm(film);
             }
         });
     }
@@ -454,6 +457,7 @@ public class MoviesGui {
         });
     }
 
+
     private void filterFilms() {
         String searchName = searchActorTextField.getText().toLowerCase();
         String searchTitle = searchTitleTextField.getText().toLowerCase();
@@ -521,6 +525,7 @@ public class MoviesGui {
     private void updateFilmTable() {
         filmObservableList = controller.getFilmObservableList();
         filmTable.setItems(filmObservableList);
+        filmTable.refresh();
     }
 
     private void updateFilteredList(String searchName, String searchTitle, Category searchCategory, Rating searchRating) {

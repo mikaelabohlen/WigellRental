@@ -115,7 +115,6 @@ public class CustomersGui {
         customerGridPane.add(deleteCustomerButton,0,4,1,1);
         customerGridPane.add(updateCustomerButton,0,5,1,1);
         customerGridPane.add(updateCustomerTableButton,0,6,1,1);
-        //TODO SDKG F
 
         customerObservableList = controller.getCustomerObservableList();
 

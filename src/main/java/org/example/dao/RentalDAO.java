@@ -23,4 +23,19 @@ public class RentalDAO extends AbstractDAO<Rental>{
             return rentals;
         }
     }
+
+    public List<Rental> getRentalsForCustomer(int customerId) {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+
+            String queryString = "SELECT r FROM Rental r WHERE r.customer.id = :customerId";
+            Query query = session.createQuery(queryString);
+            query.setParameter("customerId", customerId);
+            List<Rental> rentals = query.getResultList();
+
+            session.getTransaction().commit();
+            return rentals;
+        }
+    }
+
 }
