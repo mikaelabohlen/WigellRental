@@ -103,4 +103,14 @@ class ControllerTest {
         controller.getInventoryDAO().create(inventory);
     }
 
+    @Test
+    void addOneActorAndUpdateFilm(){
+        Film film = controller.getFilmDAO().read(1000);
+        List<Actor> actors = controller.getActorDAO().getActorsForFilm(1000);
+        for(Actor actor : actors){
+            System.out.println(actor.getFirstName() +" "+actor.getLastName());
+        }
+
+    }
+
 }

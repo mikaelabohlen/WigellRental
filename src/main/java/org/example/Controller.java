@@ -275,7 +275,7 @@ public class Controller {
     }
     void connectActorWithFilm(Film film, List<Actor> actors) {
         for (Actor actor : actors) {
-            if (film.getActors() == null || !film.getActors().contains(actor)) {
+            if (film.getActors() == null || film.getActors().stream().filter(actor1 -> actor1.getId() == actor.getId()).count() == 0) {
                 actor.addOneMovie(film);
                 actorDAO.update(actor);
             }
