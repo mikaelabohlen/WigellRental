@@ -282,10 +282,10 @@ public class CustomersGui {
 
     private void handleDeleteCustomerButton() {
         deleteCustomerButton.setOnMouseClicked(event-> {
-            //TODO går ej att ta bort på grund av fk constraint payment. hur göra?
+            //TODO Går nu att radera kund... tar dock bort payment och rental då också. OBS inte alltid den försvinner från listan? varför? Krävs debugging
 
             Customer customer = customerTable.getSelectionModel().getSelectedItem();
-            controller.getCustomerDAO().delete(customer.getCustomerId());
+            controller.deleteSelectedCustomer(customer);
         });
     }
 

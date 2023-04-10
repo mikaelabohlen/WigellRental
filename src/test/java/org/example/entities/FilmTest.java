@@ -42,13 +42,20 @@ class FilmTest {
         System.out.println(film.getInStock(1));
 
 
-
 //        while(interator.hasNext()){
 //            System.out.println(interator.get);
 //        }
 //        Assert.equals(film.getInventories().getRental());
     }
 
+    @Test
+    void deleteFilm(){
+        FilmDAO filmDAO = new FilmDAO();
+        Film film = filmDAO.read(1000);
+        //film.deleteAssociations();
+        filmDAO.delete(film.getFilmId());
+
+    }
 /*    @Test
     void createNewFilm () {
         LanguageDAO languageDAO = new LanguageDAO();

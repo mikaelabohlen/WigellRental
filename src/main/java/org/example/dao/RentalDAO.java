@@ -37,5 +37,13 @@ public class RentalDAO extends AbstractDAO<Rental>{
             return rentals;
         }
     }
-
+    public void deleteRentalsByCustomerId(int customerId) {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("delete from Rental where customer.customerId = :customerId");
+            query.setParameter("customerId", customerId);
+            query.executeUpdate();
+            session.getTransaction().commit();
+        }
+    }
 }

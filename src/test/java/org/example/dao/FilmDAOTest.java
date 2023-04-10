@@ -57,21 +57,21 @@ public class FilmDAOTest {
         categories.add(category);
         categoryDAO.create(category);
 
-    Film film = new Film();
-    film.setTitle("Fool's Journey");
-    film.setReleaseYear(2023);
-    film.setLanguage(language);
-    film.setLength(140);
-    film.setRating(Rating.PG13);
-    film.setSpecialFeatures("Trailers");
-    film.setActors(actors);
-    film.setCategories(categories);
-    film.setRentalRate(new BigDecimal("9.99"));
-    film.setReplacementCost(new BigDecimal("19.99"));
-    film.setDescription("A young man sets out to right the world, a task only a Fool would be foolish enough to attempt.");
-    film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        System.out.println(film);
-        filmDAO.create(film);
+//    Film film = new Film();
+//    film.setTitle("Fool's Journey");
+//    film.setReleaseYear(2023);
+//    film.setLanguage(language);
+//    film.setLength(140);
+//    film.setRating(Rating.PG13);
+//    film.setSpecialFeatures("Trailers");
+//    film.setActors(actors);
+//    film.setCategories(categories);
+//    film.setRentalRate(new BigDecimal("9.99"));
+//    film.setReplacementCost(new BigDecimal("19.99"));
+//    film.setDescription("A young man sets out to right the world, a task only a Fool would be foolish enough to attempt.");
+//    film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+//        System.out.println(film);
+//        filmDAO.create(film);
     }
 
     @Test
