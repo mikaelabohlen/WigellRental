@@ -9,7 +9,7 @@ import org.example.entities.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 public class Controller {
     private ActorDAO actorDAO;
@@ -256,25 +256,31 @@ public class Controller {
         rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
         rentalDAO.create(rental); //kolla upp cascade... uppdateras alla som påverkas?
     }
+*/
 
-    private Inventory createInventory(int filmId, int storeId) {
+    public void createNewFilm(Film film, List<Actor> actors) {
+        Film createdFilm = filmDAO.create(film);
+        connectActorWithFilm(film, actors);
+        createdFilm.setInventories(createInventory(createdFilm.getFilmId(), activeStore.getStoreId()));
+    }
+    private Set<Inventory> createInventory(int filmId, int storeId) {
+        Set<Inventory> inventories = new HashSet<>();
         Inventory inventory = new Inventory();
         inventory.setFilm(filmDAO.read(filmId));
         inventory.setStore(storeDAO.read(storeId));
-        return inventory;
+        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        Inventory createdInventory = inventoryDAO.create(inventory);
+        inventories.add(createdInventory);
+        return inventories;
     }
-
-    public void createNewFilm(Film film, List<Actor> actors) {
-        filmDAO.create(film);
-        connectActorWithFilm(film, actors);
-    }
-
     void connectActorWithFilm(Film film, List<Actor> actors) {
         for (Actor actor : actors) {
-            actor.addOneMovie(film);
-            actorDAO.update(actor);
+            if (film.getActors() == null || !film.getActors().contains(actor)) {
+                actor.addOneMovie(film);
+                actorDAO.update(actor);
+            }
         }
-    }*/
+    }
 
     public List<Actor> getActors(Film selectedFilm) {
         return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
@@ -299,25 +305,39 @@ public class Controller {
         customerObservableList = FXCollections.observableList(customerDAO.getAll());
     }
 
-
     //MOVIES GUI
-    public void deleteSelectedFilm(Film selectedItem) {
-        //TODO funkar inte pga fk constraints
-        filmDAO.delete(selectedItem.getFilmId());
+    public void deleteSelectedFilm(Film selectedFilm) {
+        //TODO ska nu fungera. tar bort koppling men ej actor, dock tar den bort inventoryn med.
+        deleteAssociationsFilm(selectedFilm);
+        filmDAO.delete(selectedFilm.getFilmId());
     }
 
-    public void updateSelectedFilm(Film selectedItem) {
+    public void deleteAssociationsFilm(Film selectredFilm) {
+        for (Actor actor : actorDAO.getActorsForFilm(selectredFilm.getFilmId())) {
+            List<Film> films = actor.getFilms();
+            System.out.println(films.size());
+            System.out.println(films);
+            films.removeIf(film -> {
+                return film.getFilmId() == selectredFilm.getFilmId();
+            });
+            System.out.println(films.size());
+            actor.setFilms(films);
+            actorDAO.update(actor);
+        }
+
+        for(Inventory invetory : inventoryDAO.getInventoriesForFilm(selectredFilm.getFilmId())){
+            inventoryDAO.delete(invetory.getInventoryId());
+        }
+    }
+
+    public void updateSelectedFilm(Film selectedItem, List<Actor> actors) {
+        connectActorWithFilm(selectedItem, actors);
         getFilmDAO().update(selectedItem);
-    }
-
-    public void createNewFilm(Film film) {
-        filmDAO.create(film);
     }
 
     public void updateFilmList() {
         filmObservableList = FXCollections.observableList(filmDAO.getAll());
     }
-
 
     //RENT GUI
     public void rentFilm(String customerId, Film selectedFilm) {
@@ -351,7 +371,32 @@ public class Controller {
         rentalDAO.update(selectedRental);
     }
 
-//    public void rentFilm() {
-//    }
+    public void createActor(Actor actor) {
+        actorDAO.create(actor);
+    }
+
+
+    public Actor getOrCreateActor(String name) {
+        Actor actor = actorDAO.findActorByName(name);
+        if(actor == null){
+            String[] names = name.split(" ");
+            String firstName = names[0];
+            String lastName = names[1];
+            Actor newActor = new Actor();
+            newActor.setFirstName(firstName);
+            newActor.setLastName(lastName);
+            newActor.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+            createActor(newActor);
+            return actorDAO.read(newActor.getId());
+        }else{
+            return actor;
+        }
+    }
+
+    public void deleteSelectedCustomer(Customer customer) {
+        paymentDAO.deletePaymentsByCustomerId(customer.getCustomerId());
+        rentalDAO.deleteRentalsByCustomerId(customer.getCustomerId());
+        customerDAO.delete(customer.getCustomerId());
+    }
 
 }

@@ -1,5 +1,8 @@
 package org.example.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -19,6 +22,7 @@ public class Actor {
     private Timestamp lastUpdate;
 
     @ManyToMany (fetch = FetchType.EAGER)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(name = "film_actor",
             joinColumns = {@JoinColumn(name = "actor_id")},
             inverseJoinColumns = {@JoinColumn(name = "film_id")})

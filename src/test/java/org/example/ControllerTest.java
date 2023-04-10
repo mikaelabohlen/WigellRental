@@ -25,17 +25,17 @@ class ControllerTest {
         controller = new Controller(new ActorDAO(), new AddressDAO(), new CategoryDAO(), new CityDAO(), new CustomerDAO(), new FilmDAO(), new InventoryDAO(), new LanguageDAO(), new PaymentDAO(), new RentalDAO(), new StaffDAO(), new StoreDAO());
     }
 
-    @Test
-    void doesFilmGetRented() {
-        Film film = controller.getFilmDAO().read(1);
-        Inventory inventory = controller.canFilmBeRented(film,1);
-        if(!(inventory ==null)) {
-            controller.createRental(inventory.getInventoryId(), inventory.getStore().getStoreId(), controller.getCustomerDAO().read(1).getCustomerId());
-        } else{
-            System.out.println("Win!!!");
-        }
-//        Assertions.assertFalse(controller.rentFilms(filmsToRent, 1,1));
-    }
+//    @Test
+//    void doesFilmGetRented() {
+//        Film film = controller.getFilmDAO().read(1);
+//        Inventory inventory = controller.canFilmBeRented(film,1);
+//        if(!(inventory ==null)) {
+//            controller.createRental(inventory.getInventoryId(), inventory.getStore().getStoreId(), controller.getCustomerDAO().read(1).getCustomerId());
+//        } else{
+//            System.out.println("Win!!!");
+//        }
+////        Assertions.assertFalse(controller.rentFilms(filmsToRent, 1,1));
+//    }
     @Test
     void createNewFilm () {
         Film film = new Film();

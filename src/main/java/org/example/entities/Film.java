@@ -1,11 +1,15 @@
 package org.example.entities;
 
+import org.example.dao.ActorDAO;
 import org.example.enums.Rating;
 import org.example.utils.RatingConverter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
@@ -59,7 +63,7 @@ public class Film {
     private Timestamp lastUpdate;
 
     @ManyToMany(mappedBy = "films", fetch = FetchType.LAZY)
-    @Fetch(value = FetchMode.SUBSELECT)
+//    @Fetch(value = FetchMode.SUBSELECT) //TODO Ska denna vara med?
     private List<Actor> actors;
 
     @ManyToOne()

@@ -21,6 +21,25 @@ public class ActorDAO extends AbstractDAO<Actor> {
         }
     }
 
+    public Actor findActorByFirstAndLastName(String firstName, String lastName) {
+        try (Session session = getSession()) {
+            Query<Actor> query = session.createQuery("from Actor where firstName = :firstName and lastName = :lastName", Actor.class);
+            query.setParameter("firstName", firstName);
+            query.setParameter("lastName", lastName);
+            return query.uniqueResult();
+        }
+    }
+public Actor findActorByName(String name) {
+    try (Session session = getSession()) {
+        String[] names = name.split(" ");
+        String firstName = names[0];
+        String lastName = names[1];
+        Query<Actor> query = session.createQuery("from Actor where concat(firstName, ' ', lastName) like :name", Actor.class);
+        query.setParameter("name", "%" + firstName + " " + lastName + "%");
+        return query.uniqueResult();
+    }
+}
+
     public List<Actor> getActorsForFilm(int selectedFilmId) {
         try (Session session = getSession()) {
             session.beginTransaction();
@@ -30,5 +49,14 @@ public class ActorDAO extends AbstractDAO<Actor> {
             session.getTransaction().commit();
             return actors;
         }
+    }
+
+    public void deleteAssociations(Actor actor, FilmDAO filmDAO) {
+        for (Film film : actor.getFilms()) {
+            film.getActors().remove(actor);
+            filmDAO.update(film);
+        }
+        actor.getFilms().clear();
+        update(actor);
     }
 }

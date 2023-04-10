@@ -20,6 +20,7 @@ import org.example.utils.TimeUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -349,8 +350,16 @@ public class MoviesGui {
                 film.setCategory(selectedCategory);
                 film.setSpecialFeatures(specialFeaturesTextField.getText());
                 film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-                //TODO HURFAN FÅR MAN TILL MED SETACTORS?
-                controller.createNewFilm(film);
+                //TODO Denna bör nu lägga till ösnkade actors och även skapa upp dem om de inte finns. Funkar inte att uppdatera en actor-list
+
+                List<String> actorNames = actorsListView.getItems();
+                List<Actor> actors = new ArrayList<>();
+
+                for(String name : actorNames){
+                    Actor actor = controller.getOrCreateActor(name);
+                    actors.add(actor);
+                }
+                controller.createNewFilm(film, actors);
             }
         });
     }
@@ -388,7 +397,15 @@ public class MoviesGui {
                 selectedFilm.setCategory(selectedCategory);
                 selectedFilm.setSpecialFeatures(specialFeaturesTextField.getText());
                 selectedFilm.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-                controller.updateSelectedFilm(selectedFilm);
+
+                List<String> actorNames = actorsListView.getItems();
+                List<Actor> actors = new ArrayList<>();
+
+                for(String name : actorNames){
+                    Actor actor = controller.getOrCreateActor(name);
+                    actors.add(actor);
+                }
+                controller.updateSelectedFilm(selectedFilm, actors);
             }
         });
     }
