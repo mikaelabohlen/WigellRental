@@ -22,7 +22,7 @@ public class Inventory {
 
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
-    @OneToMany(mappedBy = "inventory")
+    @OneToMany(mappedBy = "inventory", fetch = FetchType.EAGER)
     private List<Rental> rentals;
 
     public Integer getInventoryId() {
