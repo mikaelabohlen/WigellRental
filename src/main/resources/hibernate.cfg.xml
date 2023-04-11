@@ -15,6 +15,7 @@
         <property name="current_session_context_class">thread</property>
         <property name="show_sql">true</property>
         <property name="format_sql">false</property>
+
         <!--        <property name="hbm2ddl.auto">update</property> // TODO&ndash;&gt; Ska inte denna vara här?-->
         <!--        <property name="hibernate.dialect">org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect</property>-->
 
