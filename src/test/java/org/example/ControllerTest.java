@@ -112,5 +112,11 @@ class ControllerTest {
         }
 
     }
+    @Test
+    void deleteFilmFromStore(){
+        controller.setActiveStore("1");
+        Film film = controller.getFilmDAO().read(1000);
+        controller.deleteFilmFromStore(film);
+    }
 
 }

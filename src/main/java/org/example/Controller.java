@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Controller {
     private ActorDAO actorDAO;
@@ -233,7 +234,9 @@ public class Controller {
     }
 
 
+
     public boolean canFilmBeRented(Film selectedFilm, int storeId) {
+
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
         for (Inventory inventoryItem : inventories) {
 //            if (inventoryObservableList.contains(inventoryItem)) {
@@ -268,8 +271,25 @@ public class Controller {
 //            System.out.println("No item available");
 //            return false;
         }
+
         return false;
     }
+
+        System.out.println("No item available");
+        return null;
+    }
+
+    public void createRental(int inventoryId, int storeId, int customerId) {
+        Rental rental = new Rental();
+        rental.setRentalDate(LocalDateTime.now());
+        rental.setInventory(inventoryDAO.read(inventoryId));
+        rental.setCustomer(customerDAO.read(customerId));
+        rental.setStaff(storeDAO.read(storeId).getManagerStaff());
+        rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+        rentalDAO.create(rental); //kolla upp cascade... uppdateras alla som påverkas?
+    }
+
+
 
     public void createNewFilm(Film film, List<Actor> actors, int numOfFilm) {
         Film createdFilm = filmDAO.create(film);
@@ -325,26 +345,45 @@ public class Controller {
 
     //MOVIES GUI
     public void deleteSelectedFilm(Film selectedFilm) {
-        //TODO ska nu fungera. tar bort koppling men ej actor, dock tar den bort inventoryn med.
-        deleteAssociationsFilm(selectedFilm);
-        filmDAO.delete(selectedFilm.getFilmId());
+        //TODO ska nu fungera.
+//        deleteAssociationsFilm(selectedFilm);
+        deleteFilmFromStore(selectedFilm);
+//        filmDAO.delete(selectedFilm.getFilmId());
     }
 
-    public void deleteAssociationsFilm(Film selectredFilm) {
-        for (Actor actor : actorDAO.getActorsForFilm(selectredFilm.getFilmId())) {
-            List<Film> films = actor.getFilms();
-            System.out.println(films.size());
-            System.out.println(films);
-            films.removeIf(film -> {
-                return film.getFilmId() == selectredFilm.getFilmId();
-            });
-            System.out.println(films.size());
-            actor.setFilms(films);
-            actorDAO.update(actor);
-        }
+//    public void deleteAssociationsFilm(Film selectredFilm) {
+//        for (Actor actor : actorDAO.getActorsForFilm(selectredFilm.getFilmId())) {
+//            List<Film> films = actor.getFilms();
+//            System.out.println(films.size());
+//            System.out.println(films);
+//            films.removeIf(film -> {
+//                return film.getFilmId() == selectredFilm.getFilmId();
+//            });
+//            System.out.println(films.size());
+//            actor.setFilms(films);
+//            actorDAO.update(actor);
+//        }
+//
+//        for(Inventory invetory : inventoryDAO.getInventoriesForFilm(selectredFilm.getFilmId())){
+//            for(Rental rental : rentalDAO.getRentalsForInventory(invetory.getInventoryId())){
+//                if(rental.getReturnDate()==null){
+//
+//                }
+//            }
+//            inventoryDAO.delete(invetory.getInventoryId());
+//        }
+//    }
 
-        for(Inventory invetory : inventoryDAO.getInventoriesForFilm(selectredFilm.getFilmId())){
-            inventoryDAO.delete(invetory.getInventoryId());
+    public void deleteFilmFromStore(Film selectedFilm){
+        List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
+        for(Inventory inventory : inventories){
+            if(inventory.getStore().getStoreId() == activeStore.getStoreId()) {
+                List<Rental> rentals = rentalDAO.getRentalsForInventory(inventory.getInventoryId());
+                for(Rental rental : rentals){
+                    rentalDAO.delete(rental.getRentalId());
+                }
+                inventoryDAO.delete(inventory.getInventoryId());
+            }
         }
     }
 
