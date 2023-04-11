@@ -286,6 +286,7 @@ public class CustomersGui {
 
             Customer customer = customerTable.getSelectionModel().getSelectedItem();
             controller.deleteSelectedCustomer(customer);
+
         });
     }
 
@@ -327,10 +328,12 @@ public class CustomersGui {
     }
 
     private void updateCustomerTable() {
+        controller.updateCustomerList();
         customerObservableList = controller.getCustomerObservableList();
         filteredCustomers = customerObservableList.stream()
                 .filter(customer -> customer.getStore().getStoreId() == controller.getActiveStore().getStoreId())
                 .collect(Collectors.toList());
+        customerTable.getItems().clear();
         customerTable.getItems().addAll(filteredCustomers);
     }
 

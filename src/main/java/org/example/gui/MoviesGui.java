@@ -474,7 +474,6 @@ public class MoviesGui {
         });
     }
 
-
     private void filterFilms() {
         String searchName = searchActorTextField.getText().toLowerCase();
         String searchTitle = searchTitleTextField.getText().toLowerCase();
@@ -542,6 +541,7 @@ public class MoviesGui {
     private void updateFilmTable() {
         filmObservableList = controller.getFilmObservableList();
         filmTable.setItems(filmObservableList);
+        filteredList = new FilteredList<>(filmObservableList, p -> true);
         filmTable.refresh();
     }
 
