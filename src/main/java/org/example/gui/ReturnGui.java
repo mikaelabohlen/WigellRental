@@ -111,6 +111,7 @@ public class ReturnGui {
             enterCustomerId();
         });
     }
+
     private void setupRentalsTable() {
         rentalTable = new TableView<>();
         idColumn = new TableColumn<>("Uthyrnings-ID");

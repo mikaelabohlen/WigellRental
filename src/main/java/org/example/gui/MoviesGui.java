@@ -1,6 +1,7 @@
 package org.example.gui;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
@@ -23,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MoviesGui {
@@ -312,8 +314,8 @@ public class MoviesGui {
 
     private void handleAddMovieButton() {
         //TODO KAN DENNA LÖSAS SNYGGARE/BÄTTRE????? ANTAGLIGEN MEN HUR
-        addMovieButton.setOnMouseClicked(event-> {
-            if(!allFilledOut()) {
+        addMovieButton.setOnMouseClicked(event -> {
+            if (!allFilledOut()) {
                 return;
             }
             String selectedTitle = titleTextField.getText();
@@ -323,45 +325,53 @@ public class MoviesGui {
             Category selectedCategory = categoryChoiceBox2.getValue();
             Language selectedLanguage = languageChoiceBox.getValue();
             Rating selectedRating = ratingChoiceBox2.getValue();
-
             double defaultRentalRate = 4.99;
             double defaultReplacementCost = 19.99;
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Lägg till film");
-            alert.setHeaderText("Lägga till");
-            alert.setContentText("Vill du lägga till " + selectedTitle + " i databasen?");
 
-            ButtonType yesButton = new ButtonType("Ja");
-            ButtonType noButton = new ButtonType("Nej");
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Ange antal");
+            dialog.setHeaderText(selectedTitle);
+            dialog.setContentText("Ange antal filmer som ska läggas till");
+            Optional<String> result1 = dialog.showAndWait();
+            result1.ifPresent(amount -> {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Lägg till film");
+                alert.setHeaderText("Lägga till");
+                alert.setContentText("Vill du lägga till " + amount + " " + selectedTitle + " i databasen?");
+                ButtonType yesButton = new ButtonType("Ja");
+                ButtonType noButton = new ButtonType("Nej");
 
-            alert.getButtonTypes().setAll(yesButton, noButton);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == yesButton) {
-                Film film = new Film();
-                film.setTitle(selectedTitle);
-                film.setDescription(selectedDescription);
-                film.setReleaseYear(selectedReleaseYear);
-                film.setLanguage(selectedLanguage);
-                film.setLength(selectedLength);
-                film.setRentalRate(BigDecimal.valueOf(defaultRentalRate));
-                film.setReplacementCost(BigDecimal.valueOf(defaultReplacementCost));
-                film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-                film.setRating(selectedRating);
-                film.setCategory(selectedCategory);
-                film.setSpecialFeatures(specialFeaturesTextField.getText());
-                film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-                //TODO Denna bör nu lägga till ösnkade actors och även skapa upp dem om de inte finns. Funkar inte att uppdatera en actor-list
+                alert.getButtonTypes().setAll(yesButton, noButton);
+                Optional<ButtonType> result2 = alert.showAndWait();
+                if (result2.get() == yesButton) {
+                    Film film = new Film();
+                    film.setTitle(selectedTitle);
+                    film.setDescription(selectedDescription);
+                    film.setReleaseYear(selectedReleaseYear);
+                    film.setLanguage(selectedLanguage);
+                    film.setLength(selectedLength);
+                    film.setRentalRate(BigDecimal.valueOf(defaultRentalRate));
+                    film.setReplacementCost(BigDecimal.valueOf(defaultReplacementCost));
+                    film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+                    film.setRating(selectedRating);
+                    film.setCategory(selectedCategory);
+                    film.setSpecialFeatures(specialFeaturesTextField.getText());
+                    film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+                    //TODO Denna bör nu lägga till ösnkade actors och även skapa upp dem om de inte finns. Funkar inte att uppdatera en actor-list
 
-                List<String> actorNames = actorsListView.getItems();
-                List<Actor> actors = new ArrayList<>();
+                    List<String> actorNames = actorsListView.getItems();
+                    List<Actor> actors = new ArrayList<>();
 
-                for(String name : actorNames){
-                    Actor actor = controller.getOrCreateActor(name);
-                    actors.add(actor);
+                    for (String name : actorNames) {
+                        Actor actor = controller.getOrCreateActor(name);
+                        actors.add(actor);
+                    }
+                    controller.createNewFilm(film, actors, Integer.parseInt(amount));
                 }
-                controller.createNewFilm(film, actors);
-            }
+            });
         });
+
+
     }
 
     private void handleUpdateMovieButton() {
@@ -533,6 +543,20 @@ public class MoviesGui {
                 actorsListView.getItems().clear();
                 for (Actor actor : actorList) {
                     actorsListView.getItems().add(actor.getFirstName() + " " + actor.getLastName());
+                }
+            }
+            if(event.getClickCount()==2) {
+                if(controller.canFilmBeRented(selectedFilm, controller.getActiveStore().getStoreId())){
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Information");
+                    alert.setHeaderText("Filmen har lagts till i filmer att hyra.");
+//                    alert.setContentText("Till priset av " + cost + "dollar");
+                    alert.showAndWait();
+                }else{
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Information");
+                    alert.setHeaderText("Alla exemplar är tyvärr uthyrda.");
+                    alert.showAndWait();
                 }
             }
         });

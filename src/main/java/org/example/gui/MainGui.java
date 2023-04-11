@@ -29,6 +29,7 @@ public class MainGui {
     private RentGui rentGui;
     private ReturnGui returnGui;
     private StaffGui staffGui;
+    private StoreGui storeGui;
 
 
     public MainGui(Stage primaryStage, Controller controller) {
@@ -79,7 +80,7 @@ public class MainGui {
     }
 
     private class Left {
-        private Button moviesButton, rentButton, returnButton, customersButton, staffButton;
+        private Button moviesButton, rentButton, returnButton, customersButton, staffButton, storeButton;
         private VBox buttonVBox;
         private ArrayList<Button> navButtons;
 
@@ -94,6 +95,8 @@ public class MainGui {
             customersButton.setFocusTraversable(false);
             staffButton = new Button("Personal");
             staffButton.setFocusTraversable(false);
+            storeButton = new Button("Butik");
+            storeButton.setFocusTraversable(false);
 
             navButtons = new ArrayList<>();
             navButtons.add(moviesButton);
@@ -101,6 +104,7 @@ public class MainGui {
             navButtons.add(returnButton);
             navButtons.add(customersButton);
             navButtons.add(staffButton);
+            navButtons.add(storeButton);
 
             buttonVBox = new VBox();
             buttonVBox.setAlignment(Pos.TOP_LEFT);
@@ -120,6 +124,7 @@ public class MainGui {
         rentGui = new RentGui(controller);
         returnGui = new ReturnGui(controller);
         staffGui = new StaffGui(controller);
+        storeGui = new StoreGui(controller);
 
         mainPane = new BorderPane();
         mainScene = new Scene(mainPane, 1200, 1000);
@@ -148,6 +153,7 @@ public class MainGui {
         handleReturnButton();
         handleStaffButton();
         handleCustomerButton();
+        handleStoreButton();
     }
 
     private void handleCustomerButton() {
@@ -182,7 +188,17 @@ public class MainGui {
             mainPane.setCenter(null);
             enableNavButtons();
             left.rentButton.setDisable(true);
+            rentGui.getCart();
             mainPane.setCenter(rentGui.setViewToRent());
+        });
+    }
+
+    private void handleStoreButton() {
+        left.storeButton.setOnMouseClicked(event-> {
+            mainPane.setCenter(null);
+            enableNavButtons();
+            left.storeButton.setDisable(true);
+            mainPane.setCenter(storeGui.setViewToStore());
         });
     }
 
@@ -201,6 +217,7 @@ public class MainGui {
         left.returnButton.setDisable(false);
         left.customersButton.setDisable(false);
         left.staffButton.setDisable(false);
+        left.storeButton.setDisable(false);
     }
 
     private void disableNavButtons() {
@@ -209,6 +226,7 @@ public class MainGui {
         left.returnButton.setDisable(true);
         left.customersButton.setDisable(true);
         left.staffButton.setDisable(true);
+        left.storeButton.setDisable(true);
     }
 
     private void handleChoseStoreSubmitButton() {
@@ -240,5 +258,7 @@ public class MainGui {
         returnGui.buttonAndEvents();
         staffGui.setup();
         staffGui.buttonAndEvents();
+        storeGui.setup();
+        storeGui.buttonAndEvents();
     }
 }

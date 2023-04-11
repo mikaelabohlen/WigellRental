@@ -74,7 +74,7 @@ public class Address implements Serializable {
         this.district = district;
     }
 
-    public City city() {
+    public City getCity() {
         return city;
     }
 
