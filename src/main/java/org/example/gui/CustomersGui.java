@@ -166,13 +166,13 @@ public class CustomersGui {
 
         cityColumn = new TableColumn<Customer, City>("Stad:");
         cityColumn.setCellValueFactory(cellData-> {
-            City city = cellData.getValue().getAddress().city();
+            City city = cellData.getValue().getAddress().getCity();
             return new SimpleObjectProperty<City>(city);
         });
 
         countryColumn = new TableColumn<Customer, Country>("Land");
         countryColumn.setCellValueFactory(cellData-> {
-            Country country = cellData.getValue().getAddress().city().getCountry();
+            Country country = cellData.getValue().getAddress().getCity().getCountry();
             return new SimpleObjectProperty<Country>(country);
         });
 
@@ -233,9 +233,9 @@ public class CustomersGui {
                 phoneTextField.setText(selectedCustomer.getAddress().getPhone());
                 address1TextField.setText(selectedCustomer.getAddress().getAddress());
                 districtTextField.setText(selectedCustomer.getAddress().getDistrict());
-                countryChoiceBox.setValue(selectedCustomer.getAddress().city().getCountry());
+                countryChoiceBox.setValue(selectedCustomer.getAddress().getCity().getCountry());
                 postalCodeTextField.setText(selectedCustomer.getAddress().getPostalCode());
-                cityTextField.setText(selectedCustomer.getAddress().city().getCity());
+                cityTextField.setText(selectedCustomer.getAddress().getCity().getCity());
             }
         });
     }
@@ -314,12 +314,12 @@ public class CustomersGui {
                 customer.setFirstName(firstNameTextField.getText().toUpperCase());
                 customer.setLastName(lastNameTextField.getText().toUpperCase());
                 customer.setEmail(emailTextField.getText().toUpperCase());
-                customer.getAddress().city().setCountry(countryChoiceBox.getValue());
+                customer.getAddress().getCity().setCountry(countryChoiceBox.getValue());
                 customer.getAddress().setPhone(phoneTextField.getText());
                 customer.getAddress().setAddress(address1TextField.getText());
                 customer.getAddress().setDistrict(districtTextField.getText());
                 customer.getAddress().setPostalCode(postalCodeTextField.getText());
-                customer.getAddress().city().setCity(cityTextField.getText());
+                customer.getAddress().getCity().setCity(cityTextField.getText());
 
                 controller.updateCustomer(customer);
             }

@@ -271,20 +271,23 @@ public class Controller {
         return false;
     }
 
-    public void createNewFilm(Film film, List<Actor> actors) {
+    public void createNewFilm(Film film, List<Actor> actors, int numOfFilm) {
         Film createdFilm = filmDAO.create(film);
         connectActorWithFilm(film, actors);
-        createdFilm.setInventories(createInventory(createdFilm.getFilmId(), activeStore.getStoreId()));
+        createdFilm.setInventories(createInventory(createdFilm.getFilmId(), numOfFilm));
     }
 
     private Set<Inventory> createInventory(int filmId, int numOfFilms) {
         Set<Inventory> inventories = new HashSet<>();
-        Inventory inventory = new Inventory();
-        inventory.setFilm(filmDAO.read(filmId));
-        inventory.setStore(storeDAO.read(storeId));
-        inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        Inventory createdInventory = inventoryDAO.create(inventory);
-        inventories.add(createdInventory);
+
+        for(int i = 0; i<numOfFilms; i++){
+            Inventory inventory = new Inventory();
+            inventory.setFilm(filmDAO.read(filmId));
+            inventory.setStore(activeStore);
+            inventory.setLastUpdate(new Timestamp(System.currentTimeMillis()));
+            Inventory createdInventory = inventoryDAO.create(inventory);
+            inventories.add(createdInventory);
+        }
         return inventories;
     }
 
@@ -303,14 +306,14 @@ public class Controller {
 
     // CUSTOMER GUI
     public void updateCustomer(Customer customer) {
-        getCityDAO().update(customer.getAddress().city());
+        getCityDAO().update(customer.getAddress().getCity());
         getAddressDAO().update(customer.getAddress());
         getCustomerDAO().update(customer);
     }
 
     public void createNewCustomer(Customer customer) {
         //TODO inte klart
-        getCityDAO().create(customer.getAddress().city());
+        getCityDAO().create(customer.getAddress().getCity());
         getAddressDAO().create(customer.getAddress());
         customer.setStore(activeStore);
         getCustomerDAO().create(customer);

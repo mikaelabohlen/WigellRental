@@ -3,6 +3,7 @@ package org.example.entities;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -29,7 +30,7 @@ public class Payment {
     private BigDecimal amount;
 
     @Column(name = "payment_date", nullable = false)
-    private Timestamp paymentDate;
+    private LocalDateTime paymentDate;
 
     @Column(name = "last_update", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
@@ -46,7 +47,7 @@ public class Payment {
         return customer;
     }
 
-    public void setCustomerId(Customer customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
@@ -54,7 +55,7 @@ public class Payment {
         return staff;
     }
 
-    public void setStaffId(Staff staff) {
+    public void setStaff(Staff staff) {
         this.staff = staff;
     }
 
@@ -62,7 +63,7 @@ public class Payment {
         return rental;
     }
 
-    public void setRentalId(Rental rental) {
+    public void setRental(Rental rental) {
         this.rental = rental;
     }
 
@@ -74,11 +75,11 @@ public class Payment {
         this.amount = amount;
     }
 
-    public Timestamp getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Timestamp paymentDate) {
+    public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 
