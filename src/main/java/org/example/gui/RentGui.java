@@ -77,7 +77,7 @@ public class RentGui {
         inventoryTable = new TableView<>();
         inventoryTable.setItems(filmsToRent);
 
-        idColumn = new TableColumn<Inventory, Integer>("Id");
+        idColumn = new TableColumn<Inventory, Integer>("Lager-Id");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("inventoryId"));
 
         filmTitleColumn = new TableColumn<Inventory, String>("Film titel");

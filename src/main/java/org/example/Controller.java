@@ -8,10 +8,8 @@ import org.example.entities.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Controller {
     private ActorDAO actorDAO;
@@ -207,7 +205,6 @@ public class Controller {
     }
 
     public List<Film> getFilmsInStore2() {
-        //TODO denna är inge bra eftersom det inte går att uppdatera då.
         if(filmsInStore2==null){
             filmsInStore2 = filmDAO.getAllFilmsByStore(storeDAO.read(2));
         }
@@ -233,15 +230,10 @@ public class Controller {
         return activeStore;
     }
 
-
-
     public boolean canFilmBeRented(Film selectedFilm, int storeId) {
 
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
         for (Inventory inventoryItem : inventories) {
-//            if (inventoryObservableList.contains(inventoryItem)) {
-//            if (inventoryObservableList.stream().noneMatch(inventory -> Objects.equals(inventory.getInventoryId(), inventoryItem.getInventoryId())))  {
-//                if (!(inventoryObservableList.stream().filter(inventory -> inventory.getInventoryId() == inventoryItem.getInventoryId()).count() == 0))  {
                 if (inventoryObservableList.stream().noneMatch(inventory -> Objects.equals(inventory.getInventoryId(), inventoryItem.getInventoryId()))) {
                 System.out.println("InventoryId: " + inventoryItem.getInventoryId() + "\n\n\n\n\n\n\n");
                 if (storeId == inventoryItem.getStore().getStoreId()) {
@@ -268,10 +260,7 @@ public class Controller {
                     }
                 }
             }
-//            System.out.println("No item available");
-//            return false;
         }
-
         return false;
     }
 
@@ -326,34 +315,8 @@ public class Controller {
     }
 
     public void deleteSelectedFilm(Film selectedFilm) {
-        //TODO ska nu fungera.
-//        deleteAssociationsFilm(selectedFilm);
         deleteFilmFromStore(selectedFilm);
-//        filmDAO.delete(selectedFilm.getFilmId());
     }
-
-//    public void deleteAssociationsFilm(Film selectredFilm) {
-//        for (Actor actor : actorDAO.getActorsForFilm(selectredFilm.getFilmId())) {
-//            List<Film> films = actor.getFilms();
-//            System.out.println(films.size());
-//            System.out.println(films);
-//            films.removeIf(film -> {
-//                return film.getFilmId() == selectredFilm.getFilmId();
-//            });
-//            System.out.println(films.size());
-//            actor.setFilms(films);
-//            actorDAO.update(actor);
-//        }
-//
-//        for(Inventory invetory : inventoryDAO.getInventoriesForFilm(selectredFilm.getFilmId())){
-//            for(Rental rental : rentalDAO.getRentalsForInventory(invetory.getInventoryId())){
-//                if(rental.getReturnDate()==null){
-//
-//                }
-//            }
-//            inventoryDAO.delete(invetory.getInventoryId());
-//        }
-//    }
 
     public void deleteFilmFromStore(Film selectedFilm){
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
@@ -431,7 +394,7 @@ public class Controller {
     public void createStaff(Staff staff) {
         getCityDAO().create(staff.getAddress().getCity());
         getAddressDAO().create(staff.getAddress());
-        staff.setStoreId(activeStore);
+        staff.setStore(activeStore);
         staffDAO.create(staff);
     }
 
@@ -467,6 +430,9 @@ public class Controller {
     }
 
     public void deleteSelectedStaff(Staff staff) {
+        paymentDAO.deletePaymentsByStaffId(staff.getStaffId());
+        rentalDAO.deleteRentalsByStaffId(staff.getStaffId());
+
         staffDAO.delete(staff.getStaffId());
     }
 

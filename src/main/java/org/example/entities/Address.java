@@ -21,9 +21,9 @@ public class Address implements Serializable {
     private String address2;
     @Column(length = 20, nullable = false)
     private String district;
-//    @OneToOne//
-    @ManyToOne // Tomas hade denna istället för OneToOne
-    @JoinColumn(name = "city_id", nullable = false) // men om fk är nullable överflödig?
+
+    @ManyToOne
+    @JoinColumn(name = "city_id", nullable = false)
     private City city;
     @Column(name = "postal_code", length = 10, columnDefinition = "default NULL")
     private String postalCode;

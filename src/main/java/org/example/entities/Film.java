@@ -26,7 +26,7 @@ public class Film {
     @Column(length = 128, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT default NULL") //Denna är datatype TEXT i databasen?
+    @Column(columnDefinition = "TEXT default NULL")
     private String description;
 
     @Column(name = "release_year", columnDefinition = "default NULL")
@@ -63,7 +63,6 @@ public class Film {
     private Timestamp lastUpdate;
 
     @ManyToMany(mappedBy = "films", fetch = FetchType.LAZY)
-//    @Fetch(value = FetchMode.SUBSELECT) //TODO Ska denna vara med?
     private List<Actor> actors;
 
     @ManyToOne()
@@ -72,11 +71,7 @@ public class Film {
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
     private Category category;
 
-
-//    @OneToMany(mappedBy = "film", fetch = FetchType.EAGER)
-//    private List<Inventory> inventories;
-
-    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)//TODO ändra till eager?
+    @OneToMany(mappedBy = "film", fetch = FetchType.LAZY)
     private Set<Inventory> inventories;
 
 
@@ -207,33 +202,6 @@ public class Film {
 
     public void setInventories(Set<Inventory> inventories) {
         this.inventories = inventories;
-    }
-
-    public Integer getTotalStock(int storeId){
-        int totalStock = 0;
-
-        for(Inventory inventory: this.getInventories()){
-            if(inventory.getStore().getStoreId() == storeId){
-                totalStock ++;
-            }
-        }
-        return totalStock;
-    }
-    
-    public Integer getInStock(int storeId){
-        int inStock = 0;
-        boolean rented;
-
-        for(Inventory inventory: this.getInventories()){
-            for(Rental rental: inventory.getRentals()){
-                rented = rental.getReturnDate() == null;
-                if (inventory.getStore().getStoreId() == storeId && !rented) {
-                    inStock++;
-                }
-            }
-        }
-        return inStock;
-
     }
 }
 

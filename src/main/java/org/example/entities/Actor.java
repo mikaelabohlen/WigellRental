@@ -22,7 +22,6 @@ public class Actor {
     private Timestamp lastUpdate;
 
     @ManyToMany (fetch = FetchType.EAGER)
-    //@OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(name = "film_actor",
             joinColumns = {@JoinColumn(name = "actor_id")},
             inverseJoinColumns = {@JoinColumn(name = "film_id")})

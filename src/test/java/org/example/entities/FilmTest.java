@@ -44,17 +44,7 @@ class FilmTest {
     void deleteFilm(){
         FilmDAO filmDAO = new FilmDAO();
         Film film = filmDAO.read(1000);
-        //film.deleteAssociations();
         filmDAO.delete(film.getFilmId());
 
     }
-/*    @Test
-    void createNewFilm () {
-        LanguageDAO languageDAO = new LanguageDAO();
-        Film film = new Film();
-        film.setTitle("Solen");
-        film.setDescription("Bla bla bla...");
-        film.setReleaseYear(2012);
-        film.setLanguage(languageDAO.read);
-    }*/
 }

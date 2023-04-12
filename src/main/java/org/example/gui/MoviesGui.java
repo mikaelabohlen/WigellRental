@@ -76,7 +76,7 @@ public class MoviesGui {
         addMovieButton = new Button("Lägg till film");
         updateMovieButton = new Button("Uppdatera film");
         deleteMovieButton = new Button("Radera film");
-        createMovieButton = new Button("Skapa ny film");
+        createMovieButton = new Button("Rensa alla fält");
         addActorButton = new Button("Lägg till skådespelare");
         clearSearchButton = new Button("Rensa sökning");
 
@@ -256,7 +256,7 @@ public class MoviesGui {
     private void setupFilmTable() {
         filmTable = new TableView<Film>();
 
-        idColumn = new TableColumn<Film, Integer>("Id:");
+        idColumn = new TableColumn<Film, Integer>("Film-Id:");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("filmId"));
 
         titleColumn = new TableColumn<Film, String>("Titel:");

@@ -19,10 +19,6 @@ public class Category {
     private Timestamp lastUpdate;
 
     @OneToMany(mappedBy = "category")
-//    @JoinTable(name = "film_category",
-//            joinColumns = {@JoinColumn (name = "category_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "film_id")}
-//    )
     private List<Film> films;
 
     public int getCategoryId() {
