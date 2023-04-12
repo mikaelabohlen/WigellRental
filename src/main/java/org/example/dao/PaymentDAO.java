@@ -16,4 +16,13 @@ public class PaymentDAO extends AbstractDAO<Payment>{
             session.getTransaction().commit();
         }
     }
+    public void deletePaymentsByStaffId(int staffId) {
+        try (Session session = getSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("delete from Payment where staff.staffId = :staffId");
+            query.setParameter("staffId", staffId);
+            query.executeUpdate();
+            session.getTransaction().commit();
+        }
+    }
 }

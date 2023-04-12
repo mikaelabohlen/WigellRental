@@ -1,7 +1,6 @@
 package org.example.gui;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
@@ -24,7 +23,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 
 public class MoviesGui {
@@ -39,7 +38,7 @@ public class MoviesGui {
     private TextArea descriptionTextArea, actorsTextArea;
     private ListView<String> actorsListView;
     private GridPane moviesGridPane, searchGridPane;
-    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton, clearSearchButton, updateListButton;
+    private Button addMovieButton, deleteMovieButton, updateMovieButton, createMovieButton, addActorButton, clearSearchButton;
     private VBox centerVBox;
     private HBox searchHBox;
     private TableView<Film> filmTable;
@@ -77,10 +76,9 @@ public class MoviesGui {
         addMovieButton = new Button("Lägg till film");
         updateMovieButton = new Button("Uppdatera film");
         deleteMovieButton = new Button("Radera film");
-        createMovieButton = new Button("Skapa ny film");
+        createMovieButton = new Button("Rensa alla fält");
         addActorButton = new Button("Lägg till skådespelare");
         clearSearchButton = new Button("Rensa sökning");
-        updateListButton = new Button("Uppdatera listan");
 
         titleTextField = new TextField();
         releaseYearTextField = new TextField();
@@ -222,7 +220,6 @@ public class MoviesGui {
         searchGridPane.add(searchCategoryChoiceBox,2,0,1,1);
         searchGridPane.add(searchRatingLabel, 1,1,1,1);
         searchGridPane.add(searchRatingChoiceBox, 2,1,1,1);
-        searchGridPane.add(updateListButton,3,0,1,1);
         searchGridPane.add(clearSearchButton,3,1,1,1);
 
         searchHBox = new HBox();
@@ -250,7 +247,7 @@ public class MoviesGui {
         handleCreateMovieButton();
         handleAddActorButton();
         handleClearSearchButton();
-        handleUpdateListButton();
+        //handleUpdateListButton();
         handleFilmTable();
         filterFilms();
 
@@ -259,7 +256,7 @@ public class MoviesGui {
     private void setupFilmTable() {
         filmTable = new TableView<Film>();
 
-        idColumn = new TableColumn<Film, Integer>("Id:");
+        idColumn = new TableColumn<Film, Integer>("Film-Id:");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("filmId"));
 
         titleColumn = new TableColumn<Film, String>("Titel:");
@@ -357,7 +354,6 @@ public class MoviesGui {
                     film.setCategory(selectedCategory);
                     film.setSpecialFeatures(specialFeaturesTextField.getText());
                     film.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-                    //TODO Denna bör nu lägga till ösnkade actors och även skapa upp dem om de inte finns. Funkar inte att uppdatera en actor-list
 
                     List<String> actorNames = actorsListView.getItems();
                     List<Actor> actors = new ArrayList<>();
@@ -367,6 +363,7 @@ public class MoviesGui {
                         actors.add(actor);
                     }
                     controller.createNewFilm(film, actors, Integer.parseInt(amount));
+                    filmTable.getItems().add(film);
                 }
             });
         });
@@ -416,6 +413,7 @@ public class MoviesGui {
                     actors.add(actor);
                 }
                 controller.updateSelectedFilm(selectedFilm, actors);
+                filmTable.refresh();
             }
         });
     }
@@ -438,6 +436,7 @@ public class MoviesGui {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == yesButton) {
                 Film selectedFilm = filmTable.getSelectionModel().getSelectedItem();
+                filmTable.getItems().remove(filmTable.getSelectionModel().getSelectedItem());
                 controller.deleteSelectedFilm(selectedFilm);
             }
         });
@@ -463,7 +462,6 @@ public class MoviesGui {
                 if (!actorAlreadyExists) {
                     actorsListView.getItems().add(fullName);
                 }
-                //TODO hantera actor objet i kontrollern spara
             }
         });
     }
@@ -474,13 +472,6 @@ public class MoviesGui {
             searchCategoryChoiceBox.getSelectionModel().clearSelection();
             searchActorTextField.clear();
             searchTitleTextField.clear();
-        });
-    }
-
-    private void handleUpdateListButton() {
-        updateListButton.setOnMouseClicked(event-> {
-            controller.updateFilmList();
-            updateFilmTable();
         });
     }
 
@@ -562,12 +553,12 @@ public class MoviesGui {
         });
     }
 
-    private void updateFilmTable() {
+/*    private void updateFilmTable() {
         filmObservableList = controller.getFilmObservableList();
-        filmTable.setItems(filmObservableList);
         filteredList = new FilteredList<>(filmObservableList, p -> true);
+        filmTable.setItems(filteredList);
         filmTable.refresh();
-    }
+    }*/
 
     private void updateFilteredList(String searchName, String searchTitle, Category searchCategory, Rating searchRating) {
         filteredList.setPredicate(film -> {
@@ -717,14 +708,14 @@ public class MoviesGui {
             alert.show();
             return false;
         }
-       /* if(actorsListView.getItems()==null) {
+        if(actorsListView.getItems()==null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Du måste fylla i all information");
             alert.setHeaderText("Du måste lägga till skådespelare");
             alert.setContentText("Du måste lägga till skådespelare");
             alert.show();
             return false;
-        }*/
+        }
 
         return true;
 

@@ -8,10 +8,8 @@ import org.example.entities.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Controller {
     private ActorDAO actorDAO;
@@ -200,7 +198,6 @@ public class Controller {
     }
 
     public List<Film> getFilmsInStore1() {
-        //TODO denna är inge bra eftersom det inte går att uppdatera då.
         if(filmsInStore1==null) {
             filmsInStore1 = filmDAO.getAllFilmsByStore(storeDAO.read(1));
         }
@@ -208,7 +205,6 @@ public class Controller {
     }
 
     public List<Film> getFilmsInStore2() {
-        //TODO denna är inge bra eftersom det inte går att uppdatera då.
         if(filmsInStore2==null){
             filmsInStore2 = filmDAO.getAllFilmsByStore(storeDAO.read(2));
         }
@@ -224,6 +220,7 @@ public class Controller {
         }
         if(store.equals("2")) {
             activeStore = storeDAO.read(2);
+            getFilmsInStore2();
             filmObservableList = FXCollections.observableList(filmsInStore2);
             System.out.println(activeStore.getStoreId());
         }
@@ -233,15 +230,10 @@ public class Controller {
         return activeStore;
     }
 
-
-
     public boolean canFilmBeRented(Film selectedFilm, int storeId) {
 
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
         for (Inventory inventoryItem : inventories) {
-//            if (inventoryObservableList.contains(inventoryItem)) {
-//            if (inventoryObservableList.stream().noneMatch(inventory -> Objects.equals(inventory.getInventoryId(), inventoryItem.getInventoryId())))  {
-//                if (!(inventoryObservableList.stream().filter(inventory -> inventory.getInventoryId() == inventoryItem.getInventoryId()).count() == 0))  {
                 if (inventoryObservableList.stream().noneMatch(inventory -> Objects.equals(inventory.getInventoryId(), inventoryItem.getInventoryId()))) {
                 System.out.println("InventoryId: " + inventoryItem.getInventoryId() + "\n\n\n\n\n\n\n");
                 if (storeId == inventoryItem.getStore().getStoreId()) {
@@ -268,28 +260,9 @@ public class Controller {
                     }
                 }
             }
-//            System.out.println("No item available");
-//            return false;
         }
-
         return false;
     }
-
-        System.out.println("No item available");
-        return null;
-    }
-
-    public void createRental(int inventoryId, int storeId, int customerId) {
-        Rental rental = new Rental();
-        rental.setRentalDate(LocalDateTime.now());
-        rental.setInventory(inventoryDAO.read(inventoryId));
-        rental.setCustomer(customerDAO.read(customerId));
-        rental.setStaff(storeDAO.read(storeId).getManagerStaff());
-        rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        rentalDAO.create(rental); //kolla upp cascade... uppdateras alla som påverkas?
-    }
-
-
 
     public void createNewFilm(Film film, List<Actor> actors, int numOfFilm) {
         Film createdFilm = filmDAO.create(film);
@@ -324,7 +297,6 @@ public class Controller {
         return actorDAO.getActorsForFilm(selectedFilm.getFilmId());
     }
 
-    // CUSTOMER GUI
     public void updateCustomer(Customer customer) {
         getCityDAO().update(customer.getAddress().getCity());
         getAddressDAO().update(customer.getAddress());
@@ -332,7 +304,6 @@ public class Controller {
     }
 
     public void createNewCustomer(Customer customer) {
-        //TODO inte klart
         getCityDAO().create(customer.getAddress().getCity());
         getAddressDAO().create(customer.getAddress());
         customer.setStore(activeStore);
@@ -343,36 +314,9 @@ public class Controller {
         customerObservableList = FXCollections.observableList(customerDAO.getAll());
     }
 
-    //MOVIES GUI
     public void deleteSelectedFilm(Film selectedFilm) {
-        //TODO ska nu fungera.
-//        deleteAssociationsFilm(selectedFilm);
         deleteFilmFromStore(selectedFilm);
-//        filmDAO.delete(selectedFilm.getFilmId());
     }
-
-//    public void deleteAssociationsFilm(Film selectredFilm) {
-//        for (Actor actor : actorDAO.getActorsForFilm(selectredFilm.getFilmId())) {
-//            List<Film> films = actor.getFilms();
-//            System.out.println(films.size());
-//            System.out.println(films);
-//            films.removeIf(film -> {
-//                return film.getFilmId() == selectredFilm.getFilmId();
-//            });
-//            System.out.println(films.size());
-//            actor.setFilms(films);
-//            actorDAO.update(actor);
-//        }
-//
-//        for(Inventory invetory : inventoryDAO.getInventoriesForFilm(selectredFilm.getFilmId())){
-//            for(Rental rental : rentalDAO.getRentalsForInventory(invetory.getInventoryId())){
-//                if(rental.getReturnDate()==null){
-//
-//                }
-//            }
-//            inventoryDAO.delete(invetory.getInventoryId());
-//        }
-//    }
 
     public void deleteFilmFromStore(Film selectedFilm){
         List<Inventory> inventories = inventoryDAO.getInventoriesForFilm(selectedFilm.getFilmId());
@@ -393,29 +337,21 @@ public class Controller {
     }
 
     public void updateFilmList() {
-        filmObservableList = FXCollections.observableList(filmDAO.getAll());
+        if(activeStore.getStoreId()==1) {
+            activeStore = storeDAO.read(1);
+            System.out.println("hej");
+            getFilmsInStore1();
+            filmObservableList = FXCollections.observableList(filmsInStore1);
+            System.out.println(activeStore.getStoreId());
+        }
+        if(activeStore.getStoreId()==2) {
+            activeStore = storeDAO.read(2);
+            getFilmsInStore2();
+            filmObservableList = FXCollections.observableList(filmsInStore2);
+            System.out.println(activeStore.getStoreId());
+        }
     }
 
-    //RENT GUI
-    public void rentFilm(String customerId, Inventory selectedFilm) {
-        LocalDate date = LocalDate.now();
-
-        Rental rental = new Rental();
-        rental.setRentalDate(date.atStartOfDay());
-        rental.setLastUpdate(new Timestamp(System.currentTimeMillis()));
-        rental.setStaff(getStaffDAO().read(getActiveStore().getStoreId()));
-
-        Customer customer = getCustomerDAO().read(Integer.parseInt(customerId));
-        rental.setCustomer(customer);
-
-        rental.setInventory(selectedFilm);
-        inventoryDAO.update(selectedFilm);
-        rentalDAO.create(rental);
-
-    }
-
-
-    //RETURN GUI
     public ObservableList<Rental> getRentals(int customerId) {
         ObservableList<Rental> customerRentals;
         customerRentals = FXCollections.observableList(rentalDAO.getRentalsForCustomer(customerId));
@@ -449,7 +385,6 @@ public class Controller {
         }
     }
 
-
     public void deleteSelectedCustomer(Customer customer) {
         paymentDAO.deletePaymentsByCustomerId(customer.getCustomerId());
         rentalDAO.deleteRentalsByCustomerId(customer.getCustomerId());
@@ -459,7 +394,7 @@ public class Controller {
     public void createStaff(Staff staff) {
         getCityDAO().create(staff.getAddress().getCity());
         getAddressDAO().create(staff.getAddress());
-        staff.setStoreId(activeStore);
+        staff.setStore(activeStore);
         staffDAO.create(staff);
     }
 
@@ -472,6 +407,7 @@ public class Controller {
         }
 
     }
+
     public Rental createRental(Inventory inventory, Customer customer) {
         Rental rental = new Rental();
         rental.setRentalDate(LocalDateTime.now());
@@ -494,10 +430,28 @@ public class Controller {
     }
 
     public void deleteSelectedStaff(Staff staff) {
+        paymentDAO.deletePaymentsByStaffId(staff.getStaffId());
+        rentalDAO.deleteRentalsByStaffId(staff.getStaffId());
+
         staffDAO.delete(staff.getStaffId());
     }
 
     public void updateStaff(Staff staff) {
         staffDAO.update(staff);
+    }
+
+    public void createNewStore(Store store) {
+        getCityDAO().create(store.getAddress().getCity());
+        getAddressDAO().create(store.getAddress());
+        storeDAO.create(store);
+        Staff staff = store.getManagerStaff();
+        staff.setStore(store);
+        updateStaff(staff);
+    }
+
+    public void deleteSelectedStore(Store store) {
+        if(store != null){
+            storeDAO.delete(store.getStoreId());
+        }
     }
 }

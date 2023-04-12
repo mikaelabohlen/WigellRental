@@ -2,8 +2,6 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Objects;
 
 @Entity
 @Table(name = "staff")
@@ -29,7 +27,7 @@ public class Staff {
     @Column(length = 40, columnDefinition = "default NULL")
     private String email;
 
-    @OneToOne // Ska denna rel ändras? ska en staff kunna jobba i flera butiker? Men isf jointable och så ser itne databasen ut.
+    @OneToOne
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
@@ -97,7 +95,7 @@ public class Staff {
         return store;
     }
 
-    public void setStoreId(Store store) {
+    public void setStore(Store store) {
         this.store = store;
     }
 
@@ -133,4 +131,8 @@ public class Staff {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
+    }
 }

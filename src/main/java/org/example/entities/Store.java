@@ -2,7 +2,7 @@ package org.example.entities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Objects;
+import java.util.List;
 
 @Entity
 @Table(name = "store")
@@ -12,7 +12,7 @@ public class Store {
     @Column(name = "store_id")
     private int storeId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "manager_staff_id", nullable = false)
     private Staff managerStaff;
 
@@ -35,8 +35,12 @@ public class Store {
         return managerStaff;
     }
 
-    public void setManagerStaffId(Staff managerStaff) {
+    public void setManagerStaff(Staff managerStaff) {
         this.managerStaff = managerStaff;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public Address getAddress() {

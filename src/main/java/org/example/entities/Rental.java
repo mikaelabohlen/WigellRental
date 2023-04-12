@@ -16,7 +16,7 @@ public class Rental {
     private int rentalId;
 
     @Column(name = "rental_date", nullable = false)
-    private LocalDateTime rentalDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
+    private LocalDateTime rentalDate;
 
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = false)
@@ -27,7 +27,7 @@ public class Rental {
     private Customer customer;
 
     @Column(name = "return_date", columnDefinition = "default NULL")
-    private LocalDateTime returnDate; //Ska detta vara LocalDate? DATETIME som datatyp i databasen
+    private LocalDateTime returnDate;
 
     @OneToOne
     @JoinColumn(name = "staff_id", nullable = false)
