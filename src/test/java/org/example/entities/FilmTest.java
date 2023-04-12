@@ -38,14 +38,6 @@ class FilmTest {
             System.out.println(inventory.getRentals());
         }
 
-        System.out.println(film.getTotalStock(1));
-        System.out.println(film.getInStock(1));
-
-
-//        while(interator.hasNext()){
-//            System.out.println(interator.get);
-//        }
-//        Assert.equals(film.getInventories().getRental());
     }
 
     @Test

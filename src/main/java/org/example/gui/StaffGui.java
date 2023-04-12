@@ -217,9 +217,11 @@ public class StaffGui {
                 staff.setAddressId(addressObject);
                 staff.setLastUpdate(new Timestamp(System.currentTimeMillis()));
                 controller.createStaff(staff);
+                staffTable.getItems().add(staff);
             }
         });
     }
+
     private void handleStaffTable() {
         staffTable.setOnMouseClicked(event-> {
             if(event.getClickCount()==2) {
@@ -286,8 +288,7 @@ public class StaffGui {
 
     private void handleFireButton() {
         fireButton.setOnMouseClicked(event-> {
-            Staff staff = staffTable.getSelectionModel().getSelectedItem();
-            controller.deleteSelectedStaff(staff);
+
         });
     }
 

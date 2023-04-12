@@ -199,6 +199,7 @@ public class MainGui {
             enableNavButtons();
             left.storeButton.setDisable(true);
             mainPane.setCenter(storeGui.setViewToStore());
+            storeGui.updateStaffList();
         });
     }
 

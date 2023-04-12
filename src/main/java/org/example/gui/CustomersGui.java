@@ -277,16 +277,23 @@ public class CustomersGui {
 
             controller.createNewCustomer(customer);
 
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Kund tillagd");
+            alert.setHeaderText(customer.getFirstName() + " " + customer.getLastName() + " tillagd");
+            alert.show();
+
         });
     }
 
     private void handleDeleteCustomerButton() {
         deleteCustomerButton.setOnMouseClicked(event-> {
-            //TODO Går nu att radera kund... tar dock bort payment och rental då också. OBS inte alltid den försvinner från listan? varför? Krävs debugging
-
             Customer customer = customerTable.getSelectionModel().getSelectedItem();
             controller.deleteSelectedCustomer(customer);
 
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Kund borttagen");
+            alert.setHeaderText(customer.getFirstName() + " " + customer.getLastName() + " borttagen");
+            alert.show();
         });
     }
 

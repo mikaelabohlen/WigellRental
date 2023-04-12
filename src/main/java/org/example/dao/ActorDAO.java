@@ -29,16 +29,16 @@ public class ActorDAO extends AbstractDAO<Actor> {
             return query.uniqueResult();
         }
     }
-public Actor findActorByName(String name) {
-    try (Session session = getSession()) {
-        String[] names = name.split(" ");
-        String firstName = names[0];
-        String lastName = names[1];
-        Query<Actor> query = session.createQuery("from Actor where concat(firstName, ' ', lastName) like :name", Actor.class);
-        query.setParameter("name", "%" + firstName + " " + lastName + "%");
-        return query.uniqueResult();
+    public Actor findActorByName(String name) {
+        try (Session session = getSession()) {
+            String[] names = name.split(" ");
+            String firstName = names[0];
+            String lastName = names[1];
+            Query<Actor> query = session.createQuery("from Actor where concat(firstName, ' ', lastName) like :name", Actor.class);
+            query.setParameter("name", "%" + firstName + " " + lastName + "%");
+            return query.uniqueResult();
+        }
     }
-}
 
     public List<Actor> getActorsForFilm(int selectedFilmId) {
         try (Session session = getSession()) {

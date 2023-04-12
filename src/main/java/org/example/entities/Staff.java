@@ -133,4 +133,8 @@ public class Staff {
         this.lastUpdate = lastUpdate;
     }
 
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
+    }
 }
